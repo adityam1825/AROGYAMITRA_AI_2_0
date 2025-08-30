@@ -24,7 +24,7 @@ const content = {
     selectCity: "Select City",
     useMyLocation: "Use My Location",
     locationSet: "Location Set",
-    cityUpdated: "Your city has been updated to Delhi.",
+    cityUpdated: (city: string) => `Your city has been updated to ${city}.`,
     locationError: "Location Error",
     couldNotAccess: "Could not access your location. Please enable location services in your browser.",
     unsupported: "Unsupported",
@@ -39,7 +39,7 @@ const content = {
     selectCity: "शहर चुनें",
     useMyLocation: "मेरे स्थान का उपयोग करें",
     locationSet: "स्थान निर्धारित",
-    cityUpdated: "आपका शहर दिल्ली में अपडेट कर दिया गया है।",
+    cityUpdated: (city: string) => `आपका शहर ${city} में अपडेट कर दिया गया है।`,
     locationError: "स्थान त्रुटि",
     couldNotAccess: "आपके स्थान तक नहीं पहुंच सका। कृपया अपने ब्राउज़र में स्थान सेवाएं सक्षम करें।",
     unsupported: "असमर्थित",
@@ -54,7 +54,7 @@ const content = {
     selectCity: "शहर निवडा",
     useMyLocation: "माझे स्थान वापरा",
     locationSet: "स्थान निश्चित केले",
-    cityUpdated: "तुमचे शहर दिल्लीमध्ये अद्यतनित केले आहे.",
+    cityUpdated: (city: string) => `तुमचे शहर ${city} मध्ये अद्यतनित केले आहे.`,
     locationError: "स्थान त्रुटी",
     couldNotAccess: "तुमच्या स्थानावर प्रवेश करू शकलो नाही। कृपया तुमच्या ब्राउझरमध्ये स्थान सेवा सक्षम करा.",
     unsupported: "असमर्थित",
@@ -69,7 +69,7 @@ const content = {
     selectCity: "ನಗರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
     useMyLocation: "ನನ್ನ ಸ್ಥಳವನ್ನು ಬಳಸಿ",
     locationSet: "ಸ್ಥಳವನ್ನು ಹೊಂದಿಸಲಾಗಿದೆ",
-    cityUpdated: "ನಿಮ್ಮ ನಗರವನ್ನು ದೆಹಲಿಗೆ ನವೀಕರಿಸಲಾಗಿದೆ.",
+    cityUpdated: (city: string) => `ನಿಮ್ಮ ನಗರವನ್ನು ${city} ಗೆ ನವೀಕರಿಸಲಾಗಿದೆ.`,
     locationError: "ಸ್ಥಳ ದೋಷ",
     couldNotAccess: "ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಪ್ರವೇಶಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ। ದಯವಿಟ್ಟು ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
     unsupported: "ಬೆಂಬಲವಿಲ್ಲ",
@@ -84,7 +84,7 @@ const content = {
     selectCity: "నగరాన్ని ఎంచుకోండి",
     useMyLocation: "నా స్థానాన్ని ఉపయోగించండి",
     locationSet: "స్థానం సెట్ చేయబడింది",
-    cityUpdated: "మీ నగరం ఢిల్లీకి నవీకరించబడింది.",
+    cityUpdated: (city: string) => `మీ నగరం ${city} కి నవీకరించబడింది.`,
     locationError: "స్థాన దోషం",
     couldNotAccess: "మీ స్థానాన్ని యాక్సెస్ చేయలేకపోయింది। దయచేసి మీ బ్రౌజర్‌లో స్థాన సేవలను ప్రారంభించండి.",
     unsupported: "మద్దతు లేదు",
@@ -99,7 +99,7 @@ const content = {
     selectCity: "நகரத்தைத் தேர்ந்தெடுக்கவும்",
     useMyLocation: "எனது இருப்பிடத்தைப் பயன்படுத்து",
     locationSet: "இருப்பிடம் அமைக்கப்பட்டது",
-    cityUpdated: "உங்கள் நகரம் தில்லிக்கு புதுப்பிக்கப்பட்டுள்ளது.",
+    cityUpdated: (city: string) => `உங்கள் நகரம் ${city} க்கு புதுப்பிக்கப்பட்டுள்ளது.`,
     locationError: "இருப்பிடப் பிழை",
     couldNotAccess: "உங்கள் இருப்பிடத்தை அணுக முடியவில்லை। உங்கள் உலாவியில் இருப்பிடச் சேவைகளை இயக்கவும்.",
     unsupported: "ஆதரிக்கப்படவில்லை",
@@ -114,7 +114,7 @@ const content = {
     selectCity: "नगरं चिनोतु",
     useMyLocation: "मम स्थानं प्रयुज्यताम्",
     locationSet: "स्थानं निर्धारितम्",
-    cityUpdated: "भवतः नगरं दिल्लीरूपेण अद्यतनं कृतम्।",
+    cityUpdated: (city: string) => `भवतः नगरं ${city} रूपेण अद्यतनं कृतम्।`,
     locationError: "स्थानत्रुटिः",
     couldNotAccess: "भवतः स्थानं प्राप्तुं न शक्तम्। कृपया स्वस्य ब्राउजरे स्थानसेवां चालयन्तु।",
     unsupported: "असमर्थितम्",
@@ -144,7 +144,7 @@ export function Header() {
     sa: 'संस्कृतम्',
   };
 
-  const cities: City[] = ['Mumbai', 'Delhi', 'Bangalore', 'Kolkata', 'Chennai'];
+  const cities: City[] = ['Mumbai', 'Delhi', 'Bangalore', 'Kolkata', 'Chennai', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Surat'];
 
   const handleLocationClick = () => {
     setIsLocating(true);
@@ -153,11 +153,12 @@ export function Header() {
         (position) => {
           // In a real app, you would use a reverse geocoding service
           // to get the city from position.coords.latitude and position.coords.longitude.
-          // For this prototype, we'll simulate finding a city.
-          setCity('Delhi'); // Simulate setting city to Delhi
+          // For this prototype, we'll simulate finding a city by picking a random one from our list.
+          const randomCity = cities[Math.floor(Math.random() * cities.length)];
+          setCity(randomCity);
           toast({
             title: t.locationSet,
-            description: t.cityUpdated,
+            description: t.cityUpdated(randomCity),
           });
           setIsLocating(false);
         },
