@@ -5,6 +5,11 @@ import {
   type GenerateSurgePredictionsInput,
   type GenerateSurgePredictionsOutput,
 } from "@/ai/flows/generate-surge-predictions";
+import {
+  textToSpeech,
+  type TextToSpeechInput,
+  type TextToSpeechOutput,
+} from '@/ai/flows/text-to-speech';
 
 export async function getSurgePredictions(input: GenerateSurgePredictionsInput): Promise<{
     success: boolean;
@@ -24,4 +29,20 @@ export async function getSurgePredictions(input: GenerateSurgePredictionsInput):
 
         return { success: false, error: `Failed to generate surge predictions: ${errorMessage}` };
     }
+}
+
+export async function generateSpeech(
+  input: TextToSpeechInput
+): Promise<{ success: boolean; data?: TextToSpeechOutput; error?: string }> {
+  try {
+    const result = await textToSpeech(input);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error generating speech:', error);
+    let errorMessage = 'An unknown error occurred.';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return { success: false, error: `Failed to generate speech: ${errorMessage}` };
+  }
 }

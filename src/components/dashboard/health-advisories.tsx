@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { HeartPulse } from 'lucide-react';
+import { HeartPulse, Volume2, Loader2 } from 'lucide-react';
+import { generateSpeech } from '@/app/actions';
+import { useToast } from "@/hooks/use-toast";
 
 const advisories = {
   en: {
@@ -24,6 +26,36 @@ type Language = 'en' | 'mr' | 'hi';
 
 export function HealthAdvisories() {
   const [language, setLanguage] = useState<Language>('en');
+  const [isLoading, setIsLoading] = useState(false);
+  const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
+
+  const handleListen = async () => {
+    setIsLoading(true);
+    if (audioPlayer) {
+      audioPlayer.pause();
+      setAudioPlayer(null);
+    }
+    
+    const advisoryText = `${advisories[language].title}. ${advisories[language].content}`;
+
+    const result = await generateSpeech({ text: advisoryText, language: language });
+    setIsLoading(false);
+
+    if (result.success && result.data) {
+      const audio = new Audio(result.data.audio);
+      setAudioPlayer(audio);
+      audio.play();
+      audio.onended = () => setAudioPlayer(null);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Audio Failed",
+        description: result.error || "Could not generate audio for the advisory.",
+      });
+    }
+  };
+
 
   return (
     <Card>
@@ -43,6 +75,14 @@ export function HealthAdvisories() {
       <CardContent>
         <h3 className="font-semibold mb-2">{advisories[language].title}</h3>
         <p className="text-sm text-muted-foreground">{advisories[language].content}</p>
+         <Button onClick={handleListen} disabled={isLoading} size="sm" className="mt-4">
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Volume2 className="mr-2 h-4 w-4" />
+          )}
+          Listen
+        </Button>
       </CardContent>
     </Card>
   );
