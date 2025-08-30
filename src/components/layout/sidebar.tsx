@@ -70,7 +70,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <LogoIcon />
-          <span className="text-xl font-semibold">ArogyaMitra AI</span>
+          <span className="text-3xl font-semibold">ArogyaMitra AI</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
