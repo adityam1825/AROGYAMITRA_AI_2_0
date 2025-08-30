@@ -10,6 +10,7 @@ import { SurgePredictionChart } from "@/components/dashboard/surge-prediction-ch
 import { HealthAdvisories } from "@/components/dashboard/health-advisories";
 import { RecentAlerts } from "@/components/dashboard/recent-alerts";
 import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-tool";
+import { MainDashboard } from "@/components/dashboard/main-dashboard";
 
 export const metadata: Metadata = {
   title: "Dashboard | SurgeGuard Mumbai",
@@ -26,24 +27,7 @@ export default function DashboardPage() {
         <div className="flex flex-col flex-1">
           <Header />
           <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight">
-                Mumbai Health Dashboard
-              </h1>
-            </div>
-            <div className="space-y-4">
-              <OverviewCards />
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                 <div className="col-span-4">
-                  <SurgePredictionChart />
-                 </div>
-                <div className="col-span-4 lg:col-span-3 space-y-4">
-                  <HealthAdvisories />
-                  <RecentAlerts />
-                </div>
-              </div>
-              <SurgePredictionTool />
-            </div>
+            <MainDashboard />
           </main>
         </div>
       </div>

@@ -1,34 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HeartPulse, Volume2, Loader2 } from 'lucide-react';
 import { generateSpeech } from '@/app/actions';
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from '@/context/language-context';
 
 const advisories = {
   en: {
     title: "Health Advisory: High Pollution Levels",
     content: "Air quality is currently unhealthy. It is advised to stay indoors, use air purifiers, and wear N95 masks if you must go out. Elderly and children should take extra precautions. Stay hydrated.",
-  },
-  mr: {
-    title: "आरोग्य सल्ला: उच्च प्रदूषण पातळी",
-    content: "हवेची गुणवत्ता सध्या অস্বাস্থ্যकर आहे. घरातच राहण्याचा, एअर प्युरिफायर वापरण्याचा आणि बाहेर जाणे आवश्यक असल्यास N95 मास्क घालण्याचा सल्ला दिला जातो. वृद्ध आणि मुलांनी अतिरिक्त काळजी घ्यावी. हायड्रेटेड रहा.",
+    listen: "Listen",
+    header: "Health Advisories",
   },
   hi: {
     title: "स्वास्थ्य सलाह: उच्च प्रदूषण स्तर",
     content: "वायु की गुणवत्ता वर्तमान में अस्वस्थ है। घर के अंदर रहने, एयर प्यूरीफायर का उपयोग करने और यदि बाहर निकलना ही पड़े तो N95 मास्क पहनने की सलाह दी जाती है। बुजुर्गों और बच्चों को अतिरिक्त सावधानी बरतनी चाहिए। हाइड्रेटेड रहें।",
+    listen: "सुनें",
+    header: "स्वास्थ्य सलाह",
+  },
+  mr: {
+    title: "आरोग्य सल्ला: उच्च प्रदूषण पातळी",
+    content: "हवेची गुणवत्ता सध्या অস্বাস্থ্যकर आहे. घरातच राहण्याचा, एअर प्युरिफायर वापरण्याचा आणि बाहेर जाणे आवश्यक असल्यास N95 मास्क घालण्याचा सल्ला दिला जातो. वृद्ध आणि मुलांनी अतिरिक्त काळजी घ्यावी. हायड्रेटेड रहा.",
+    listen: "ऐका",
+    header: "आरोग्य सल्ला",
   },
 };
 
-type Language = 'en' | 'mr' | 'hi';
 
 export function HealthAdvisories() {
-  const [language, setLanguage] = useState<Language>('en');
+  const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const t = advisories[language];
+
+  useEffect(() => {
+    // Stop audio when language changes
+    if (audioPlayer) {
+      audioPlayer.pause();
+      setAudioPlayer(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
+
 
   const handleListen = async () => {
     setIsLoading(true);
@@ -37,7 +54,7 @@ export function HealthAdvisories() {
       setAudioPlayer(null);
     }
     
-    const advisoryText = `${advisories[language].title}. ${advisories[language].content}`;
+    const advisoryText = `${t.title}. ${t.content}`;
 
     const result = await generateSpeech({ text: advisoryText, language: language });
     setIsLoading(false);
@@ -63,25 +80,20 @@ export function HealthAdvisories() {
         <div className="flex items-center justify-between">
             <div className='flex items-center gap-2'>
                 <HeartPulse className="h-6 w-6 text-primary" />
-                <CardTitle>Health Advisories</CardTitle>
-            </div>
-            <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
-                <Button variant={language === 'en' ? 'default' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setLanguage('en')}>EN</Button>
-                <Button variant={language === 'mr' ? 'default' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setLanguage('mr')}>MR</Button>
-                <Button variant={language === 'hi' ? 'default' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setLanguage('hi')}>HI</Button>
+                <CardTitle>{t.header}</CardTitle>
             </div>
         </div>
       </CardHeader>
       <CardContent>
-        <h3 className="font-semibold mb-2">{advisories[language].title}</h3>
-        <p className="text-sm text-muted-foreground">{advisories[language].content}</p>
+        <h3 className="font-semibold mb-2">{t.title}</h3>
+        <p className="text-sm text-muted-foreground">{t.content}</p>
          <Button onClick={handleListen} disabled={isLoading} size="sm" className="mt-4">
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Volume2 className="mr-2 h-4 w-4" />
           )}
-          Listen
+          {t.listen}
         </Button>
       </CardContent>
     </Card>
