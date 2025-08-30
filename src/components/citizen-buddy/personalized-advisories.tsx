@@ -184,7 +184,7 @@ export function PersonalizedAdvisories() {
         {advisory && (
           <div className="space-y-4">
             <div className='flex items-center justify-end'>
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={!advisory.audio}>
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={!advisory.audio || !!audioPlayer}>
                     <Volume2 className="mr-2 h-4 w-4" />
                     {t.listen}
                 </Button>
