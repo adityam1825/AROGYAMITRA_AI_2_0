@@ -99,11 +99,11 @@ export function CitizenBuddyDashboard() {
       </div>
       <div className="space-y-6">
         <PersonalizedAdvisories />
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 items-stretch">
             <SymptomChecker />
             <EmergencySOS />
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 items-stretch">
           <PlaceholderCard title={t.reminders} description={t.remindersDesc} icon={Bell} comingSoonText={t.comingSoon} />
           <PlaceholderCard title={t.report} description={t.reportDesc} icon={History} comingSoonText={t.comingSoon} />
         </div>

@@ -227,7 +227,7 @@ export function EmergencySOS() {
         <CardDescription>{t.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col gap-2">
             <EmergencyButton service="Ambulance" serviceText={t.ambulance} icon={HeartPulse} onActivate={handleActivate} />
             <EmergencyButton service="Police" serviceText={t.police} icon={Shield} onActivate={handleActivate} />
             <EmergencyButton service="Fire" serviceText={t.fire} icon={Flame} onActivate={handleActivate} />
