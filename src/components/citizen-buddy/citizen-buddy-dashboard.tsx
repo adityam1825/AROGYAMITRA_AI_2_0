@@ -6,49 +6,63 @@ import { SymptomChecker } from "./symptom-checker";
 import { EmergencySOS } from "./emergency-sos";
 import { MedicationReminders } from "./medication-reminders";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { History, Ban } from 'lucide-react';
+import { Hospital, CalendarPlus, Ban } from 'lucide-react';
 
 const content = {
     en: {
         title: "Citizen Buddy",
-        report: "Report an Issue",
-        reportDesc: "Report a local health concern.",
+        findHospital: "Find Nearby Hospitals",
+        findHospitalDesc: "Locate clinics and hospitals near you.",
+        bookAppointment: "Book Appointment",
+        bookAppointmentDesc: "Schedule a visit with a doctor.",
         comingSoon: "Coming Soon",
     },
     hi: {
         title: "सिटीजन बडी",
-        report: "समस्या की रिपोर्ट करें",
-        reportDesc: "स्थानीय स्वास्थ्य संबंधी चिंता की रिपोर्ट करें।",
+        findHospital: "आस-पास के अस्पताल खोजें",
+        findHospitalDesc: "अपने आस-पास के क्लिनिक और अस्पताल खोजें।",
+        bookAppointment: "अपॉइंटमेंट बुक करें",
+        bookAppointmentDesc: "डॉक्टर के साथ विज़िट शेड्यूल करें।",
         comingSoon: "जल्द आ रहा है",
     },
     mr: {
         title: "सिटिझन बडी",
-        report: "समस्येची तक्रार करा",
-        reportDesc: "स्थानिक आरोग्य समस्येची तक्रार करा.",
+        findHospital: "जवळची रुग्णालये शोधा",
+        findHospitalDesc: "तुमच्या जवळची क्लिनिक आणि रुग्णालये शोधा.",
+        bookAppointment: "अपॉइंटमेंट बुक करा",
+        bookAppointmentDesc: "डॉक्टरांसोबत भेटीची वेळ निश्चित करा.",
         comingSoon: "लवकरच येत आहे",
     },
     kn: {
         title: "ಸಿಟಿಜನ್ ಬಡ್ಡಿ",
-        report: "ಸಮಸ್ಯೆಯನ್ನು ವರದಿ ಮಾಡಿ",
-        reportDesc: "ಸ್ಥಳೀಯ ಆರೋಗ್ಯ ಕಾಳಜಿಯನ್ನು ವರದಿ ಮಾಡಿ.",
+        findHospital: "ಹತ್ತಿರದ ಆಸ್ಪತ್ರೆಗಳನ್ನು ಹುಡುಕಿ",
+        findHospitalDesc: "ನಿಮ್ಮ ಹತ್ತಿರದ ಕ್ಲಿನಿಕ್‌ಗಳು ಮತ್ತು ಆಸ್ಪತ್ರೆಗಳನ್ನು ಪತ್ತೆ ಮಾಡಿ.",
+        bookAppointment: "ಅಪಾಯಿಂಟ್ಮೆಂಟ್ ಕಾಯ್ದಿರಿಸಿ",
+        bookAppointmentDesc: "ವೈದ್ಯರೊಂದಿಗೆ ಭೇಟಿಯನ್ನು ನಿಗದಿಪಡಿಸಿ.",
         comingSoon: "ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ",
     },
     te: {
         title: "సిటిజన్ బడ్డీ",
-        report: "సమస్యను నివేదించండి",
-        reportDesc: "స్థానిక ఆరోగ్య సమస్యను నివేదించండి.",
+        findHospital: " సమీపంలోని ఆసుపత్రులను కనుగొనండి",
+        findHospitalDesc: "మీకు సమీపంలోని క్లినిక్‌లు మరియు ఆసుపత్రులను గుర్తించండి.",
+        bookAppointment: "అపాయింట్‌మెంట్ బుక్ చేయండి",
+        bookAppointmentDesc: "డాక్టర్‌తో సందర్శనను షెడ్యూల్ చేయండి.",
         comingSoon: "త్వరలో వస్తుంది",
     },
     ta: {
         title: "சிட்டிசன் படி",
-        report: "சிக்கலைப் புகாரளிக்கவும்",
-        reportDesc: "உள்ளூர் சுகாதார அக்கறையைப் புகாரளிக்கவும்.",
+        findHospital: "அருகிலுள்ள மருத்துவமனைகளைக் கண்டறியவும்",
+        findHospitalDesc: "உங்களுக்கு அருகிலுள்ள கிளினிக்குகள் மற்றும் மருத்துவமனைகளைக் கண்டறியவும்.",
+        bookAppointment: "சந்திப்பை பதிவு செய்யவும்",
+        bookAppointmentDesc: " மருத்துவருடன் சந்திப்பைத் திட்டமிடுங்கள்.",
         comingSoon: "விரைவில் வருகிறது",
     },
     sa: {
         title: "नागरिक-बन्धुः",
-        report: "समस्यां सूचयन्तु",
-        reportDesc: "स्थानीयां स्वास्थ्यचिन्तां सूचयन्तु।",
+        findHospital: "समीपस्थानि चिकित्सालयान् अन्विष्यन्तु",
+        findHospitalDesc: "भवतः समीपे चिकित्सालयान् अन्विष्यन्तु।",
+        bookAppointment: "समयं निश्चिनोतु",
+        bookAppointmentDesc: "वैद्येन सह मेलनस्य समयं निश्चिनोतु।",
         comingSoon: "शीघ्रम् आगमिष्यति",
     },
 };
@@ -92,7 +106,10 @@ export function CitizenBuddyDashboard() {
         </div>
         <div className="grid md:grid-cols-2 gap-6 items-stretch">
           <MedicationReminders />
-          <PlaceholderCard title={t.report} description={t.reportDesc} icon={History} comingSoonText={t.comingSoon} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <PlaceholderCard title={t.findHospital} description={t.findHospitalDesc} icon={Hospital} comingSoonText={t.comingSoon} />
+            <PlaceholderCard title={t.bookAppointment} description={t.bookAppointmentDesc} icon={CalendarPlus} comingSoonText={t.comingSoon} />
+          </div>
         </div>
       </div>
     </>
