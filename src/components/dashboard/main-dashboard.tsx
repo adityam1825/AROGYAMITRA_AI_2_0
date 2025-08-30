@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useLanguage } from '@/context/language-context';
 import { useCity } from '@/context/city-context';
 import { OverviewCards } from "@/components/dashboard/overview-cards";
@@ -8,7 +7,6 @@ import { SurgePredictionChart } from "@/components/dashboard/surge-prediction-ch
 import { HealthAdvisories } from "@/components/dashboard/health-advisories";
 import { RecentAlerts } from "@/components/dashboard/recent-alerts";
 import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-tool";
-import { FestivalCalendar } from './festival-calendar';
 
 const content = {
   en: {
@@ -38,7 +36,6 @@ export function MainDashboard() {
   const { language } = useLanguage();
   const { city } = useCity();
   const t = content[language];
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   return (
     <>
@@ -48,14 +45,13 @@ export function MainDashboard() {
         </h1>
       </div>
       <div className="space-y-4">
-        <OverviewCards selectedDate={selectedDate} />
+        <OverviewCards />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <div className="col-span-4">
-            <SurgePredictionChart selectedDate={selectedDate} />
+            <SurgePredictionChart />
           </div>
           <div className="col-span-4 lg:col-span-3 space-y-4">
-             <FestivalCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
-            <HealthAdvisories selectedDate={selectedDate} />
+            <HealthAdvisories />
           </div>
         </div>
         <SurgePredictionTool />
