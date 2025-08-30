@@ -9,7 +9,7 @@ import { CitizenBuddyDashboard } from "@/components/citizen-buddy/citizen-buddy-
 
 
 export const metadata: Metadata = {
-  title: "Citizen Buddy | SurgeGuard",
+  title: "Citizen Buddy | ArogyaMitra AI",
   description: "Personalized health advisories, symptom checker, and emergency tools for citizens.",
 };
 

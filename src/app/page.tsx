@@ -13,7 +13,7 @@ import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-too
 import { MainDashboard } from "@/components/dashboard/main-dashboard";
 
 export const metadata: Metadata = {
-  title: "Dashboard | SurgeGuard Mumbai",
+  title: "Dashboard | ArogyaMitra AI",
   description: "Real-time dashboard for patient surge prediction and management.",
 };
 

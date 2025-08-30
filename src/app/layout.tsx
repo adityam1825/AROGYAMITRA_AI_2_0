@@ -5,7 +5,7 @@ import { LanguageProvider } from '@/context/language-context';
 import { CityProvider } from '@/context/city-context';
 
 export const metadata: Metadata = {
-  title: 'SurgeGuard Mumbai',
+  title: 'ArogyaMitra AI',
   description: 'AI-driven healthtech platform to predict and manage patient surges in Mumbai.',
 };
 
