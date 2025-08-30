@@ -10,6 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import wav from 'wav';
+import { getCachedAudio, setCachedAudio } from '@/ai/audio-cache';
 
 const TextToSpeechInputSchema = z.object({
   text: z.string().describe('The text to be converted to speech.'),
@@ -37,6 +38,12 @@ const textToSpeechFlow = ai.defineFlow(
     outputSchema: TextToSpeechOutputSchema,
   },
   async (input) => {
+    const cacheKey = `${input.language}:${input.text}`;
+    const cached = getCachedAudio(cacheKey);
+    if (cached) {
+      return { audio: cached };
+    }
+
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
@@ -55,9 +62,12 @@ const textToSpeechFlow = ai.defineFlow(
     );
 
     const wavData = await toWav(audioBuffer);
+    const audioDataUri = 'data:audio/wav;base64,' + wavData;
+    
+    setCachedAudio(cacheKey, audioDataUri);
 
     return {
-      audio: 'data:audio/wav;base64,' + wavData,
+      audio: audioDataUri,
     };
   }
 );
