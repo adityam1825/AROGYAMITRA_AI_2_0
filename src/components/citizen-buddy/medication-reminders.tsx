@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,12 @@ import { Bell, PlusCircle, Trash2, Clock, Pill } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from "@/hooks/use-toast";
 
 const content = {
   en: {
     title: "Medication Reminders",
-    description: "Set reminders for your medicines. You'll receive a notification.",
+    description: "Set reminders for your medicines. You'll receive a notification and an alarm.",
     medicineName: "Medicine Name",
     medicinePlaceholder: "e.g., Paracetamol",
     dosage: "Dosage",
@@ -23,10 +24,12 @@ const content = {
     addReminder: "Add Reminder",
     noReminders: "No reminders set yet.",
     reminders: "Your Reminders",
+    reminderAlertTitle: "Medication Reminder",
+    reminderAlertDesc: (medicine: string, dosage: string) => `Time to take your ${medicine}${dosage ? ` (${dosage})` : ''}.`,
   },
   hi: {
     title: "दवा अनुस्मारक",
-    description: "अपनी दवाओं के लिए अनुस्मारक सेट करें। आपको एक सूचना प्राप्त होगी।",
+    description: "अपनी दवाओं के लिए अनुस्मारक सेट करें। आपको एक सूचना और एक अलार्म प्राप्त होगा।",
     medicineName: "दवा का नाम",
     medicinePlaceholder: "जैसे, पैरासिटामोल",
     dosage: "खुराक",
@@ -35,10 +38,12 @@ const content = {
     addReminder: "अनुस्मारक जोड़ें",
     noReminders: "अभी तक कोई अनुस्मारक सेट नहीं है।",
     reminders: "आपके अनुस्मारक",
+    reminderAlertTitle: "दवा अनुस्मारक",
+    reminderAlertDesc: (medicine: string, dosage: string) => `अपनी ${medicine}${dosage ? ` (${dosage})` : ''} लेने का समय।`,
   },
   mr: {
     title: "औषध स्मरणपत्रे",
-    description: "तुमच्या औषधांसाठी स्मरणपत्रे सेट करा. तुम्हाला एक सूचना मिळेल.",
+    description: "तुमच्या औषधांसाठी स्मरणपत्रे सेट करा. तुम्हाला एक सूचना आणि अलार्म मिळेल.",
     medicineName: "औषधाचे नाव",
     medicinePlaceholder: "उदा., पॅरासिटामॉल",
     dosage: "डोस",
@@ -47,10 +52,12 @@ const content = {
     addReminder: "स्मरणपत्र जोडा",
     noReminders: "अद्याप कोणतीही स्मरणपत्रे सेट केलेली नाहीत.",
     reminders: "तुमची स्मरणपत्रे",
+    reminderAlertTitle: "औषध स्मरणपत्र",
+    reminderAlertDesc: (medicine: string, dosage: string) => `तुमचे ${medicine}${dosage ? ` (${dosage})` : ''} घेण्याची वेळ झाली आहे.`,
   },
   kn: {
     title: "ಔಷಧಿ ಜ್ಞಾಪನೆಗಳು",
-    description: "ನಿಮ್ಮ ಔಷಧಿಗಳಿಗಾಗಿ ಜ್ಞಾಪನೆಗಳನ್ನು ಹೊಂದಿಸಿ. ನೀವು ಅಧಿಸೂಚನೆಯನ್ನು ಸ್ವೀಕರಿಸುವಿರಿ.",
+    description: "ನಿಮ್ಮ ಔಷಧಿಗಳಿಗಾಗಿ ಜ್ಞಾಪನೆಗಳನ್ನು ಹೊಂದಿಸಿ. ನೀವು ಅಧಿಸೂಚನೆ ಮತ್ತು ಅಲಾರಂ ಅನ್ನು ಸ್ವೀಕರಿಸುವಿರಿ.",
     medicineName: "ಔಷಧದ ಹೆಸರು",
     medicinePlaceholder: "ಉದಾ., ಪ್ಯಾರಾಸಿಟಮಾಲ್",
     dosage: "ಡೋಸೇಜ್",
@@ -59,10 +66,12 @@ const content = {
     addReminder: "ಜ್ಞಾಪನೆಯನ್ನು ಸೇರಿಸಿ",
     noReminders: "ಯಾವುದೇ ಜ್ಞಾಪನೆಗಳನ್ನು ಹೊಂದಿಸಲಾಗಿಲ್ಲ.",
     reminders: "ನಿಮ್ಮ ಜ್ಞಾಪನೆಗಳು",
+    reminderAlertTitle: "ಔಷಧಿ ಜ್ಞಾಪನೆ",
+    reminderAlertDesc: (medicine: string, dosage: string) => `ನಿಮ್ಮ ${medicine}${dosage ? ` (${dosage})` : ''} ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯ.`,
   },
   te: {
     title: "మందుల రిమైండర్లు",
-    description: "మీ మందుల కోసం రిమైండర్లను సెట్ చేయండి. మీరు ఒక నోటిఫికేషన్ అందుకుంటారు.",
+    description: "మీ మందుల కోసం రిమైండర్లను సెట్ చేయండి. మీరు ఒక నోటిఫికేషన్ మరియు అలారం అందుకుంటారు.",
     medicineName: "మందు పేరు",
     medicinePlaceholder: "ఉదా., పారాసెటమాల్",
     dosage: "మోతాదు",
@@ -71,10 +80,12 @@ const content = {
     addReminder: "రిమైండర్ను జోడించు",
     noReminders: "ఇంకా రిమైండర్లు సెట్ చేయబడలేదు.",
     reminders: "మీ రిమైండర్లు",
+    reminderAlertTitle: "మందుల రిమైండర్",
+    reminderAlertDesc: (medicine: string, dosage: string) => `మీ ${medicine}${dosage ? ` (${dosage})` : ''} తీసుకునే సమయం.`,
   },
   ta: {
     title: "மருந்து நினைவூட்டல்கள்",
-    description: "உங்கள் மருந்துகளுக்கான நினைவூட்டல்களை அமைக்கவும். நீங்கள் ஒரு அறிவிப்பைப் பெறுவீர்கள்.",
+    description: "உங்கள் மருந்துகளுக்கான நினைவூட்டல்களை அமைக்கவும். நீங்கள் ஒரு அறிவிப்பு மற்றும் அலாரத்தைப் பெறுவீர்கள்.",
     medicineName: "மருந்து பெயர்",
     medicinePlaceholder: "எ.கா., பாராசிட்டமால்",
     dosage: "மருந்தளவு",
@@ -83,10 +94,12 @@ const content = {
     addReminder: "நினைவூட்டலைச் சேர்",
     noReminders: "நினைவூட்டல்கள் எதுவும் அமைக்கப்படவில்லை.",
     reminders: "உங்கள் நினைவூட்டல்கள்",
+    reminderAlertTitle: "மருந்து நினைவூட்டல்",
+    reminderAlertDesc: (medicine: string, dosage: string) => `உங்கள் ${medicine}${dosage ? ` (${dosage})` : ''} எடுத்துக்கொள்ள வேண்டிய நேரம்.`,
   },
   sa: {
     title: "औषधस्मारकाणि",
-    description: "स्वस्य औषधानां कृते स्मारकाणि स्थापयन्तु। भवन्तः सूचनां प्राప్स्यन्ति।",
+    description: "स्वस्य औषधानां कृते स्मारकाणि स्थापयन्तु। भवन्तः सूचनां घण्टानादं च प्राప్स्यन्ति।",
     medicineName: "औषधस्य नाम",
     medicinePlaceholder: "यथा, Paracetamol",
     dosage: "मात्रा",
@@ -95,6 +108,8 @@ const content = {
     addReminder: "स्मारकं योजयन्तु",
     noReminders: "अद्यावधि किमपि स्मारकं न स्थापितम्।",
     reminders: "भवतां स्मारकाणि",
+    reminderAlertTitle: "औषधस्मारकम्",
+    reminderAlertDesc: (medicine: string, dosage: string) => `भवतः ${medicine}${dosage ? ` (${dosage})` : ''} स्वीकर्तुं समयः।`,
   },
 };
 
@@ -103,15 +118,65 @@ interface Reminder {
   medicine: string;
   dosage: string;
   time: string;
+  lastTriggeredDate: string | null;
 }
+
+// Simple audio tone generation
+const playSound = () => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  if (!audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 pitch
+  gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.5); // Play for 0.5 seconds
+};
+
 
 export function MedicationReminders() {
   const { language } = useLanguage();
   const t = content[language];
+  const { toast } = useToast();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [medicine, setMedicine] = useState('');
   const [dosage, setDosage] = useState('');
   const [time, setTime] = useState('09:00');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+      const currentDate = now.toISOString().slice(0, 10); // YYYY-MM-DD format
+
+      reminders.forEach((reminder) => {
+        if (reminder.time === currentTime && reminder.lastTriggeredDate !== currentDate) {
+          // Trigger the reminder
+          playSound();
+          toast({
+            title: t.reminderAlertTitle,
+            description: t.reminderAlertDesc(reminder.medicine, reminder.dosage),
+          });
+
+          // Mark as triggered for today
+          setReminders((prevReminders) =>
+            prevReminders.map((r) =>
+              r.id === reminder.id ? { ...r, lastTriggeredDate: currentDate } : r
+            )
+          );
+        }
+      });
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [reminders, t, toast]);
 
   const handleAddReminder = (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,6 +187,7 @@ export function MedicationReminders() {
       medicine,
       dosage,
       time,
+      lastTriggeredDate: null,
     };
     setReminders([...reminders, newReminder]);
     setMedicine('');
