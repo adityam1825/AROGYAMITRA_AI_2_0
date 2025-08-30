@@ -7,7 +7,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Users } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/context/language-context';
@@ -15,24 +15,31 @@ import { useLanguage } from '@/context/language-context';
 const content = {
   en: {
     dashboard: "Dashboard",
+    citizenBuddy: "Citizen Buddy",
   },
   hi: {
     dashboard: "डैशबोर्ड",
+    citizenBuddy: "सिटीजन बडी",
   },
   mr: {
     dashboard: "डॅशबोर्ड",
+    citizenBuddy: "सिटिझन बडी",
   },
   kn: {
     dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    citizenBuddy: "ಸಿಟಿಜನ್ ಬಡ್ಡಿ",
   },
   te: {
     dashboard: "డాష్‌బోర్డ్",
+    citizenBuddy: "సిటిజన్ బడ్డీ",
   },
   ta: {
     dashboard: "டாஷ்போர்டு",
+    citizenBuddy: "சிட்டிசன் படி",
   },
   sa: {
     dashboard: "उपकरणपटलम्",
+    citizenBuddy: "नागरिक-बन्धुः",
   },
 };
 
@@ -76,6 +83,18 @@ export function AppSidebar() {
               <Link href="/">
                 <LayoutDashboard />
                 <span>{t.dashboard}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === '/citizen-buddy'}
+              tooltip={t.citizenBuddy}
+            >
+              <Link href="/citizen-buddy">
+                <Users />
+                <span>{t.citizenBuddy}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

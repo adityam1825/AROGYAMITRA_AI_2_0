@@ -10,6 +10,12 @@ import {
   type TextToSpeechInput,
   type TextToSpeechOutput,
 } from '@/ai/flows/text-to-speech';
+import {
+  generatePersonalizedAdvisory,
+  type GeneratePersonalizedAdvisoryInput,
+  type GeneratePersonalizedAdvisoryOutput,
+} from '@/ai/flows/generate-personalized-advisory';
+
 
 export async function getSurgePredictions(input: GenerateSurgePredictionsInput): Promise<{
     success: boolean;
@@ -45,4 +51,24 @@ export async function generateSpeech(
     }
     return { success: false, error: `Failed to generate speech: ${errorMessage}` };
   }
+}
+
+export async function getPersonalizedAdvisory(input: GeneratePersonalizedAdvisoryInput): Promise<{
+    success: boolean;
+    data?: GeneratePersonalizedAdvisoryOutput;
+    error?: string;
+}> {
+    try {
+        const result = await generatePersonalizedAdvisory(input);
+        return { success: true, data: result };
+    } catch (error) {
+        console.error("Error generating personalized advisory:", error);
+        
+        let errorMessage = 'An unknown error occurred.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return { success: false, error: `Failed to generate advisory: ${errorMessage}` };
+    }
 }
