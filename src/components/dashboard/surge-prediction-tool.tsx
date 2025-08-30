@@ -122,26 +122,28 @@ export function SurgePredictionTool() {
         )}
 
         {prediction && (
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-                <ListChecks className="w-5 h-5 text-primary"/>
-                <CardTitle className="text-md font-medium">Predicted Surge</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-foreground">{prediction.predictedSurge}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-                <ShieldCheck className="w-5 h-5 text-primary"/>
-                <CardTitle className="text-md font-medium">Confidence Level</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">{prediction.confidenceLevel}</p>
-              </CardContent>
-            </Card>
-             <Card className="md:col-span-3">
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+                  <ListChecks className="w-5 h-5 text-primary"/>
+                  <CardTitle className="text-md font-medium">Predicted Surge</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-foreground">{prediction.predictedSurge}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+                  <ShieldCheck className="w-5 h-5 text-primary"/>
+                  <CardTitle className="text-md font-medium">Confidence Level</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">{prediction.confidenceLevel}</p>
+                </CardContent>
+              </Card>
+            </div>
+             <Card>
               <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
                  <Zap className="w-5 h-5 text-primary"/>
                 <CardTitle className="text-md font-medium">Recommendations</CardTitle>
