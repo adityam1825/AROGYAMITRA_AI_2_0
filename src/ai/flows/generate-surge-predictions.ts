@@ -12,8 +12,11 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import wav from 'wav';
 
+const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa']);
+
 const GenerateSurgePredictionsInputSchema = z.object({
   city: z.string().describe('The city for which to generate the prediction.'),
+  language: LanguageEnum.describe('The language for the prediction.'),
 });
 
 export type GenerateSurgePredictionsInput = z.infer<
@@ -49,7 +52,7 @@ export async function generateSurgePredictions(
 
 const prompt = ai.definePrompt({
   name: 'generateSurgePredictionsPrompt',
-  input: {schema: z.object({ city: z.string() })},
+  input: {schema: z.object({ city: z.string(), language: LanguageEnum })},
   output: {schema: z.object({
     predictedSurge: z.string(),
     confidenceLevel: z.string(),
@@ -60,6 +63,7 @@ const prompt = ai.definePrompt({
   Based on your general knowledge of weather patterns, pollution levels, and major public events for {{{city}}}, predict the patient surge levels for the next 7 days.
 
   Provide the predicted surge, confidence level, and recommendations in a clear and concise manner.
+  The response should be in the language specified by the language code: {{{language}}}.
   The confidence level should be one of "Low", "Medium", or "High".
   The recommendations should be a few bullet points.
 `,

@@ -121,7 +121,7 @@ export function SurgePredictionTool() {
       setAudioPlayer(null);
     }
 
-    const result = await getSurgePredictions({ city });
+    const result = await getSurgePredictions({ city, language });
     setIsLoading(false);
 
     if (result.success && result.data) {
@@ -210,7 +210,7 @@ export function SurgePredictionTool() {
                     <Zap className="w-5 h-5 text-primary"/>
                     <CardTitle className="text-md font-medium">{t.recommendations}</CardTitle>
                  </div>
-                 <Button onClick={handleListen} size="sm" variant="outline" disabled={!prediction.audio}>
+                 <Button onClick={handleListen} size="sm" variant="outline" disabled={!prediction.audio || !!audioPlayer}>
                     <Volume2 className="mr-2 h-4 w-4" />
                     {t.listen}
                 </Button>
