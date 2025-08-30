@@ -15,6 +15,11 @@ import {
   type GeneratePersonalizedAdvisoryInput,
   type GeneratePersonalizedAdvisoryOutput,
 } from '@/ai/flows/generate-personalized-advisory';
+import {
+  symptomChecker,
+  type SymptomCheckerInput,
+  type SymptomCheckerOutput,
+} from '@/ai/flows/symptom-checker-flow';
 
 
 export async function getSurgePredictions(input: GenerateSurgePredictionsInput): Promise<{
@@ -70,5 +75,25 @@ export async function getPersonalizedAdvisory(input: GeneratePersonalizedAdvisor
         }
 
         return { success: false, error: `Failed to generate advisory: ${errorMessage}` };
+    }
+}
+
+export async function getSymptomGuidance(input: SymptomCheckerInput): Promise<{
+    success: boolean;
+    data?: SymptomCheckerOutput;
+    error?: string;
+}> {
+    try {
+        const result = await symptomChecker(input);
+        return { success: true, data: result };
+    } catch (error) {
+        console.error("Error generating symptom guidance:", error);
+        
+        let errorMessage = 'An unknown error occurred.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return { success: false, error: `Failed to generate guidance: ${errorMessage}` };
     }
 }
