@@ -6,132 +6,110 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Bell, PlusCircle, Trash2, Clock, Pill, Loader2 } from 'lucide-react';
+import { Bell, PlusCircle, Trash2, Clock, Pill } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
-import { generateSpeech } from '@/app/actions';
 
 const content = {
   en: {
     title: "Medication Reminders",
-    description: "Set reminders for your medicines. You'll receive a notification and an alarm.",
+    description: "Set reminders for your medicines. You'll receive a notification.",
     medicineName: "Medicine Name",
     medicinePlaceholder: "e.g., Paracetamol",
     dosage: "Dosage",
     dosagePlaceholder: "e.g., 1 tablet",
     time: "Time",
     addReminder: "Add Reminder",
-    addingReminder: "Adding...",
     noReminders: "No reminders set yet.",
     reminders: "Your Reminders",
     reminderAlertTitle: "Medication Reminder",
     reminderAlertDesc: (medicine: string, dosage: string) => `Time to take your ${medicine}${dosage ? ` (${dosage})` : ''}.`,
-    audioGenerationFailed: "Audio Generation Failed",
-    couldNotGenerateAudio: "Could not generate audio for the reminder.",
   },
   hi: {
     title: "दवा अनुस्मारक",
-    description: "अपनी दवाओं के लिए अनुस्मारक सेट करें। आपको एक सूचना और एक अलार्म प्राप्त होगा।",
+    description: "अपनी दवाओं के लिए अनुस्मारक सेट करें। आपको एक सूचना प्राप्त होगी।",
     medicineName: "दवा का नाम",
     medicinePlaceholder: "जैसे, पैरासिटामोल",
     dosage: "खुराक",
     dosagePlaceholder: "जैसे, 1 टैबलेट",
     time: "समय",
     addReminder: "अनुस्मारक जोड़ें",
-    addingReminder: "जोड़ा जा रहा है...",
     noReminders: "अभी तक कोई अनुस्मारक सेट नहीं है।",
     reminders: "आपके अनुस्मारक",
     reminderAlertTitle: "दवा अनुस्मारक",
     reminderAlertDesc: (medicine: string, dosage: string) => `अपनी ${medicine}${dosage ? ` (${dosage})` : ''} लेने का समय।`,
-    audioGenerationFailed: "ऑडियो जनरेशन विफल",
-    couldNotGenerateAudio: "अनुस्मारक के लिए ऑडियो उत्पन्न नहीं किया जा सका।",
   },
   mr: {
     title: "औषध स्मरणपत्रे",
-    description: "तुमच्या औषधांसाठी स्मरणपत्रे सेट करा. तुम्हाला एक सूचना आणि अलार्म मिळेल.",
+    description: "तुमच्या औषधांसाठी स्मरणपत्रे सेट करा. तुम्हाला एक सूचना मिळेल.",
     medicineName: "औषधाचे नाव",
     medicinePlaceholder: "उदा., पॅरासिटामॉल",
     dosage: "डोस",
     dosagePlaceholder: "उदा., १ टॅबलेट",
     time: "वेळ",
     addReminder: "स्मरणपत्र जोडा",
-    addingReminder: "जोडत आहे...",
     noReminders: "अद्याप कोणतीही स्मरणपत्रे सेट केलेली नाहीत.",
     reminders: "तुमची स्मरणपत्रे",
     reminderAlertTitle: "औषध स्मरणपत्र",
     reminderAlertDesc: (medicine: string, dosage: string) => `तुमचे ${medicine}${dosage ? ` (${dosage})` : ''} घेण्याची वेळ झाली आहे.`,
-    audioGenerationFailed: "ऑडिओ निर्मिती अयशस्वी",
-    couldNotGenerateAudio: "स्मरणपत्रासाठी ऑडिओ तयार करता आला नाही.",
   },
   kn: {
     title: "ಔಷಧಿ ಜ್ಞಾಪನೆಗಳು",
-    description: "ನಿಮ್ಮ ಔಷಧಿಗಳಿಗಾಗಿ ಜ್ಞಾಪನೆಗಳನ್ನು ಹೊಂದಿಸಿ. ನೀವು ಅಧಿಸೂಚನೆ ಮತ್ತು ಅಲಾರಂ ಅನ್ನು ಸ್ವೀಕರಿಸುವಿರಿ.",
+    description: "ನಿಮ್ಮ ಔಷಧಿಗಳಿಗಾಗಿ ಜ್ಞಾಪನೆಗಳನ್ನು ಹೊಂದಿಸಿ. ನೀವು ಅಧಿಸೂಚನೆಯನ್ನು ಸ್ವೀಕರಿಸುವಿರಿ.",
     medicineName: "ಔಷಧದ ಹೆಸರು",
     medicinePlaceholder: "ಉದಾ., ಪ್ಯಾರಾಸಿಟಮಾಲ್",
     dosage: "ಡೋಸೇಜ್",
     dosagePlaceholder: "ಉದಾ., 1 ಮಾತ್ರೆ",
     time: "ಸಮಯ",
     addReminder: "ಜ್ಞಾಪನೆಯನ್ನು ಸೇರಿಸಿ",
-    addingReminder: "ಸೇರಿಸಲಾಗುತ್ತಿದೆ...",
     noReminders: "ಯಾವುದೇ ಜ್ಞಾಪನೆಗಳನ್ನು ಹೊಂದಿಸಲಾಗಿಲ್ಲ.",
     reminders: "ನಿಮ್ಮ ಜ್ಞಾಪನೆಗಳು",
     reminderAlertTitle: "ಔಷಧಿ ಜ್ಞಾಪನೆ",
     reminderAlertDesc: (medicine: string, dosage: string) => `ನಿಮ್ಮ ${medicine}${dosage ? ` (${dosage})` : ''} ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯ.`,
-    audioGenerationFailed: "ಆಡಿಯೋ ಉತ್ಪಾದನೆ ವಿಫಲವಾಗಿದೆ",
-    couldNotGenerateAudio: "ಜ್ಞಾಪನೆಗಾಗಿ ಆಡಿಯೋವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.",
   },
   te: {
     title: "మందుల రిమైండర్లు",
-    description: "మీ మందుల కోసం రిమైండర్లను సెట్ చేయండి. మీరు ఒక నోటిఫికేషన్ మరియు అలారం అందుకుంటారు.",
+    description: "మీ మందుల కోసం రిమైండర్లను సెట్ చేయండి. మీరు ఒక నోటిఫికేషన్ అందుకుంటారు.",
     medicineName: "మందు పేరు",
     medicinePlaceholder: "ఉదా., పారాసెటమాల్",
     dosage: "మోతాదు",
     dosagePlaceholder: "ఉదా., 1 టాబ్లెట్",
     time: "సమయం",
     addReminder: "రిమైండర్ను జోడించు",
-    addingReminder: "జోడిస్తోంది...",
     noReminders: "ఇంకా రిమైండర్లు సెట్ చేయబడలేదు.",
     reminders: "మీ రిమైండర్లు",
     reminderAlertTitle: "మందుల రిమైండర్",
     reminderAlertDesc: (medicine: string, dosage: string) => `మీ ${medicine}${dosage ? ` (${dosage})` : ''} తీసుకునే సమయం.`,
-    audioGenerationFailed: "ఆడియో జనరేషన్ విఫలమైంది",
-    couldNotGenerateAudio: "రిమైండర్ కోసం ఆడియోను రూపొందించలేకపోయింది.",
   },
   ta: {
     title: "மருந்து நினைவூட்டல்கள்",
-    description: "உங்கள் மருந்துகளுக்கான நினைவூட்டல்களை அமைக்கவும். நீங்கள் ஒரு அறிவிப்பு மற்றும் அலாரத்தைப் பெறுவீர்கள்.",
+    description: "உங்கள் மருந்துகளுக்கான நினைவூட்டல்களை அமைக்கவும். நீங்கள் ஒரு அறிவிப்பைப் பெறுவீர்கள்.",
     medicineName: "மருந்து பெயர்",
     medicinePlaceholder: "எ.கா., பாராசிட்டமால்",
     dosage: "மருந்தளவு",
     dosagePlaceholder: "எ.கா., 1 மாத்திரை",
     time: "நேரம்",
     addReminder: "நினைவூட்டலைச் சேர்",
-    addingReminder: "சேர்க்கிறது...",
     noReminders: "நினைவூட்டல்கள் எதுவும் அமைக்கப்படவில்லை.",
     reminders: "உங்கள் நினைவூட்டல்கள்",
     reminderAlertTitle: "மருந்து நினைவூட்டல்",
     reminderAlertDesc: (medicine: string, dosage: string) => `உங்கள் ${medicine}${dosage ? ` (${dosage})` : ''} எடுத்துக்கொள்ள வேண்டிய நேரம்.`,
-    audioGenerationFailed: "ஆடியோ உருவாக்கம் தோல்வியுற்றது",
-    couldNotGenerateAudio: "நினைவூட்டலுக்கான ஆடியோவை உருவாக்க முடியவில்லை.",
   },
   sa: {
     title: "औषधस्मारकाणि",
-    description: "स्वस्य औषधानां कृते स्मारकाणि स्थापयन्तु। भवन्तः सूचनां घण्टानादं च प्राప్स्यन्ति।",
+    description: "स्वस्य औषधानां कृते स्मारकाणि स्थापयन्तु। भवन्तः सूचनां प्राప్स्यन्ति।",
     medicineName: "औषधस्य नाम",
     medicinePlaceholder: "यथा, Paracetamol",
     dosage: "मात्रा",
     dosagePlaceholder: "यथा, एका गुटिका",
     time: "समयः",
     addReminder: "स्मारकं योजयन्तु",
-    addingReminder: "योजयति...",
     noReminders: "अद्यावधि किमपि स्मारकं न स्थापितम्।",
     reminders: "भवतां स्मारकाणि",
     reminderAlertTitle: "औषधस्मारकम्",
     reminderAlertDesc: (medicine: string, dosage: string) => `भवतः ${medicine}${dosage ? ` (${dosage})` : ''} स्वीकर्तुं समयः।`,
-    audioGenerationFailed: "श्रव्यनिर्माणं विफलम्",
-    couldNotGenerateAudio: "स्मारकस्य कृते श्रव्यं निर्मातुं न शक्तम्।",
   },
 };
 
@@ -141,15 +119,7 @@ interface Reminder {
   dosage: string;
   time: string;
   lastTriggeredDate: string | null;
-  audio: string | null;
 }
-
-const playSound = (audioDataUri: string) => {
-  if (!audioDataUri) return;
-  const audio = new Audio(audioDataUri);
-  audio.play();
-};
-
 
 export function MedicationReminders() {
   const { language } = useLanguage();
@@ -159,7 +129,6 @@ export function MedicationReminders() {
   const [medicine, setMedicine] = useState('');
   const [dosage, setDosage] = useState('');
   const [time, setTime] = useState('09:00');
-  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -170,9 +139,6 @@ export function MedicationReminders() {
       reminders.forEach((reminder) => {
         if (reminder.time === currentTime && reminder.lastTriggeredDate !== currentDate) {
           // Trigger the reminder
-          if (reminder.audio) {
-            playSound(reminder.audio);
-          }
           toast({
             title: t.reminderAlertTitle,
             description: t.reminderAlertDesc(reminder.medicine, reminder.dosage),
@@ -191,37 +157,21 @@ export function MedicationReminders() {
     return () => clearInterval(interval);
   }, [reminders, t, toast]);
 
-  const handleAddReminder = async (e: React.FormEvent) => {
+  const handleAddReminder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!medicine.trim() || !time.trim()) return;
-    setIsAdding(true);
-
-    const reminderText = t.reminderAlertDesc(medicine, dosage);
-    const result = await generateSpeech({ text: reminderText, language: language });
-
-    if (!result.success || !result.data) {
-        toast({
-            variant: "destructive",
-            title: t.audioGenerationFailed,
-            description: result.error || t.couldNotGenerateAudio,
-        });
-        setIsAdding(false);
-        return;
-    }
-
+    
     const newReminder: Reminder = {
       id: Date.now(),
       medicine,
       dosage,
       time,
       lastTriggeredDate: null,
-      audio: result.data.audio,
     };
 
     setReminders([...reminders, newReminder]);
     setMedicine('');
     setDosage('');
-    setIsAdding(false);
   };
 
   const handleDeleteReminder = (id: number) => {
@@ -255,9 +205,9 @@ export function MedicationReminders() {
                 <Label htmlFor="time">{t.time}</Label>
                 <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
             </div>
-            <Button type="submit" className="w-full" disabled={isAdding}>
-                {isAdding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                {isAdding ? t.addingReminder : t.addReminder}
+            <Button type="submit" className="w-full">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                {t.addReminder}
             </Button>
         </form>
         
