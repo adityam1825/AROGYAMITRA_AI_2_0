@@ -157,11 +157,11 @@ const EmergencyButton = ({
   <button
     onClick={() => onActivate(service, serviceText)}
     className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-transparent bg-destructive/10 p-4 text-destructive transition-all hover:border-destructive hover:bg-destructive/20 focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2",
+        "flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-transparent bg-destructive/10 p-6 text-destructive transition-all hover:border-destructive hover:bg-destructive/20 focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2",
     )}
   >
-    <Icon className="h-10 w-10" />
-    <span className="text-lg font-semibold">{serviceText}</span>
+    <Icon className="h-12 w-12" />
+    <span className="text-xl font-semibold">{serviceText}</span>
   </button>
 );
 
