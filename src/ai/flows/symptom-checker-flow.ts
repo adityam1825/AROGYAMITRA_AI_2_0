@@ -15,6 +15,7 @@ const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa']);
 
 const SymptomCheckerInputSchema = z.object({
   symptoms: z.string().describe('The user-described symptoms.'),
+  age: z.number().optional().describe('The age of the user.'),
   language: LanguageEnum.describe('The language for the guidance.'),
 });
 export type SymptomCheckerInput = z.infer<typeof SymptomCheckerInputSchema>;
@@ -23,7 +24,17 @@ const SymptomCheckerOutputSchema = z.object({
   guidance: z
     .string()
     .describe('Basic, non-diagnostic guidance based on the symptoms.'),
-  audio: z.string().describe('The base64 encoded WAV audio data URI for the guidance.'),
+  medicationSuggestions: z
+    .string()
+    .describe(
+      'General, non-prescriptive suggestions for over-the-counter medication categories.'
+    ),
+  disclaimer: z
+    .string()
+    .describe('A mandatory disclaimer that this is not medical advice.'),
+  audio: z
+    .string()
+    .describe('The base64 encoded WAV audio data URI for the guidance.'),
 });
 export type SymptomCheckerOutput = z.infer<typeof SymptomCheckerOutputSchema>;
 
@@ -36,22 +47,27 @@ export async function symptomChecker(
 const guidancePrompt = ai.definePrompt({
   name: 'symptomCheckerPrompt',
   input: { schema: SymptomCheckerInputSchema },
-  output: { schema: z.object({ guidance: z.string() }) },
-  prompt: `You are a helpful AI assistant providing basic health guidance. A user has described their symptoms. 
+  output: {
+    schema: z.object({
+      guidance: z.string(),
+      medicationSuggestions: z.string(),
+      disclaimer: z.string(),
+    }),
+  },
+  prompt: `You are a helpful AI assistant providing basic health guidance. A user has described their symptoms and provided their age.
   
-  IMPORTANT: You must not provide a diagnosis. Your primary goal is to offer safe, general advice and suggest when it might be appropriate to see a doctor.
+  IMPORTANT: You must NOT provide a medical diagnosis or a prescription. Your primary goal is to offer safe, general advice and suggest when it is appropriate to see a doctor.
 
+  User Age: {{{age}}}
   User Symptoms: "{{{symptoms}}}"
 
-  Based on these symptoms, provide a short, one or two-sentence piece of general guidance in the language specified by the language code: {{{language}}}.
-
-  Start your response with a clear disclaimer like "This is not a medical diagnosis." or its equivalent in the target language.
+  Based on these symptoms, generate the following in the language specified by the language code: {{{language}}}:
   
-  Example Guidance:
-  - For a headache: "This is not a medical diagnosis. For a mild headache, resting in a quiet, dark room and staying hydrated may help. If the headache is severe or persistent, it is best to consult a doctor."
-  - For a cough: "This is not a medical diagnosis. A persistent cough can have many causes. Drinking warm fluids and using a humidifier may provide some relief. If your cough is severe or you have trouble breathing, please seek medical attention."
+  1.  **Guidance**: A short, one or two-sentence piece of general guidance.
+  2.  **Medication Suggestions**: Suggest GENERAL CATEGORIES of over-the-counter (OTC) medications that may help relieve the symptoms. DO NOT suggest specific brand names, dosages, or frequencies. For example, suggest "pain relievers (analgesics)" instead of "Take 500mg Paracetamol every 6 hours". Mention that dosage should be as per the instructions on the package or by a doctor.
+  3.  **Disclaimer**: A clear, mandatory disclaimer stating "This is not medical advice. Always consult a doctor or pharmacist before taking any medication." or its equivalent in the target language.
 
-  Generate only the guidance text.
+  Generate only the structured output.
   `,
 });
 
@@ -94,6 +110,12 @@ const symptomCheckerFlow = ai.defineFlow(
       throw new Error('Failed to generate text guidance.');
     }
 
+    const combinedText = `
+      Guidance: ${textOutput.guidance}.
+      Suggested Medications: ${textOutput.medicationSuggestions}.
+      Important Disclaimer: ${textOutput.disclaimer}.
+    `;
+
     // Sanskrit 'sa' is not supported by the TTS model, fallback to Hindi 'hi'.
     const speechLanguage = input.language === 'sa' ? 'hi' : input.language;
 
@@ -102,7 +124,7 @@ const symptomCheckerFlow = ai.defineFlow(
       config: {
         responseModalities: ['AUDIO'],
       },
-      prompt: textOutput.guidance,
+      prompt: combinedText,
     });
 
     if (!media || !media.url) {
