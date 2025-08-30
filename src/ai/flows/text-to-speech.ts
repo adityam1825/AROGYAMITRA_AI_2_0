@@ -60,7 +60,7 @@ const textToSpeechFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            languageCode: languageCode,
+            language_code: languageCode,
           },
         },
       },
