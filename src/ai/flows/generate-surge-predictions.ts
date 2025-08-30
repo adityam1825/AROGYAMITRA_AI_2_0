@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Predicts patient surges based on historical data, real-time pollution levels, and event calendars.
+ * @fileOverview Predicts patient surges based on a given city.
  *
  * - generateSurgePredictions - A function that generates patient surge predictions.
  * - GenerateSurgePredictionsInput - The input type for the generateSurgePredictions function.
@@ -10,17 +10,10 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import wav from 'wav';
 
 const GenerateSurgePredictionsInputSchema = z.object({
-  historicalData: z
-    .string()
-    .describe('Historical patient admission data as a JSON string.'),
-  realtimePollutionLevels: z
-    .string()
-    .describe('Real-time pollution levels data as a JSON string.'),
-  eventCalendar: z
-    .string()
-    .describe('Event calendar data including festivals as a JSON string.'),
+  city: z.string().describe('The city for which to generate the prediction.'),
 });
 
 export type GenerateSurgePredictionsInput = z.infer<
@@ -41,6 +34,7 @@ const GenerateSurgePredictionsOutputSchema = z.object({
     .describe(
       'Recommendations for resource allocation and staffing based on the predicted surge.'
     ),
+  audio: z.string().describe('The base64 encoded WAV audio data URI for the prediction summary.'),
 });
 
 export type GenerateSurgePredictionsOutput = z.infer<
@@ -55,20 +49,48 @@ export async function generateSurgePredictions(
 
 const prompt = ai.definePrompt({
   name: 'generateSurgePredictionsPrompt',
-  input: {schema: GenerateSurgePredictionsInputSchema},
-  output: {schema: GenerateSurgePredictionsOutputSchema},
-  prompt: `You are an expert in predicting patient surges in hospitals.
+  input: {schema: z.object({ city: z.string() })},
+  output: {schema: z.object({
+    predictedSurge: z.string(),
+    confidenceLevel: z.string(),
+    recommendations: z.string(),
+  })},
+  prompt: `You are an expert in predicting patient surges in hospitals for a given city.
 
-  Based on the historical data, real-time pollution levels, and event calendar data provided, predict the patient surge levels, confidence level, and recommendations for resource allocation and staffing.
-
-  Historical Data: {{{historicalData}}}
-  Real-time Pollution Levels: {{{realtimePollutionLevels}}}
-  Event Calendar: {{{eventCalendar}}}
+  Based on your general knowledge of weather patterns, pollution levels, and major public events for {{{city}}}, predict the patient surge levels for the next 7 days.
 
   Provide the predicted surge, confidence level, and recommendations in a clear and concise manner.
-  Remember that the predicted surge, confidenceLevel, and recommendations are strings, and should be set appropriately.
+  The confidence level should be one of "Low", "Medium", or "High".
+  The recommendations should be a few bullet points.
 `,
 });
+
+async function toWav(
+  pcmData: Buffer,
+  channels = 1,
+  rate = 24000,
+  sampleWidth = 2
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const writer = new wav.Writer({
+      channels,
+      sampleRate: rate,
+      bitDepth: sampleWidth * 8,
+    });
+
+    const bufs: any[] = [];
+    writer.on('error', reject);
+    writer.on('data', function (d) {
+      bufs.push(d);
+    });
+    writer.on('end', function () {
+      resolve(Buffer.concat(bufs).toString('base64'));
+    });
+
+    writer.write(pcmData);
+    writer.end();
+  });
+}
 
 const generateSurgePredictionsFlow = ai.defineFlow(
   {
@@ -76,8 +98,39 @@ const generateSurgePredictionsFlow = ai.defineFlow(
     inputSchema: GenerateSurgePredictionsInputSchema,
     outputSchema: GenerateSurgePredictionsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    const {output: textOutput} = await prompt(input);
+    if (!textOutput) {
+        throw new Error("Failed to generate text prediction.");
+    }
+    
+    const predictionText = `
+        Prediction: ${textOutput.predictedSurge}.
+        Confidence Level: ${textOutput.confidenceLevel}.
+        Recommendations: ${textOutput.recommendations}
+    `;
+
+    const { media } = await ai.generate({
+      model: 'googleai/gemini-2.5-flash-preview-tts',
+      config: {
+        responseModalities: ['AUDIO'],
+      },
+      prompt: predictionText,
+    });
+
+    if (!media || !media.url) {
+      throw new Error('No audio media returned from the model.');
+    }
+
+    const audioBuffer = Buffer.from(
+      media.url.substring(media.url.indexOf(',') + 1),
+      'base64'
+    );
+    const wavData = await toWav(audioBuffer);
+
+    return {
+        ...textOutput,
+        audio: 'data:audio/wav;base64,' + wavData,
+    };
   }
 );
