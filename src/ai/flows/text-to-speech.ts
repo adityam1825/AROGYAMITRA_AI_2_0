@@ -41,13 +41,18 @@ const textToSpeechFlow = ai.defineFlow(
     // We use Hindi ('hi') as a substitute in these cases.
     // The model supports a wide range of locales, but not all are available for every voice.
     // We are using a generic voice config here.
-    let languageCode = `${input.language}-IN`;
-    if (input.language === 'mr' || input.language === 'sa') {
-      languageCode = 'hi-IN';
-    } else if (input.language === 'en') {
+    let languageCode: string;
+    switch (input.language) {
+      case 'en':
         languageCode = 'en-US';
+        break;
+      case 'mr':
+      case 'sa':
+        languageCode = 'hi-IN'; // Fallback for unsupported languages
+        break;
+      default:
+        languageCode = `${input.language}-IN`;
     }
-
 
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',
