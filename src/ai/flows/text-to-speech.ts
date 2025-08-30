@@ -13,7 +13,9 @@ import wav from 'wav';
 
 const TextToSpeechInputSchema = z.object({
   text: z.string().describe('The text to be converted to speech.'),
-  language: z.enum(['en', 'hi', 'mr']).describe('The language of the text.'),
+  language: z
+    .enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa'])
+    .describe('The language of the text.'),
 });
 export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
 
@@ -35,10 +37,17 @@ const textToSpeechFlow = ai.defineFlow(
     outputSchema: TextToSpeechOutputSchema,
   },
   async (input) => {
-    // Note: The TTS model does not officially support Marathi ('mr'), but Hindi ('hi') may work as a substitute for some cases.
+    // Note: The TTS model does not officially support Marathi ('mr') or Sanskrit ('sa').
+    // We use Hindi ('hi') as a substitute in these cases.
     // The model supports a wide range of locales, but not all are available for every voice.
     // We are using a generic voice config here.
-    const languageCode = input.language === 'mr' ? 'hi-IN' : `${input.language}-IN`;
+    let languageCode = `${input.language}-IN`;
+    if (input.language === 'mr' || input.language === 'sa') {
+      languageCode = 'hi-IN';
+    } else if (input.language === 'en') {
+        languageCode = 'en-US';
+    }
+
 
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',

@@ -13,16 +13,20 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
-import { useLanguage } from '@/context/language-context';
+import { useLanguage, type Language } from '@/context/language-context';
 import { Globe } from 'lucide-react';
 
 export function Header() {
   const { language, setLanguage } = useLanguage();
 
-  const languageLabels = {
+  const languageLabels: Record<Language, string> = {
     en: 'English',
     hi: 'हिन्दी',
     mr: 'मराठी',
+    kn: 'ಕನ್ನಡ',
+    te: 'తెలుగు',
+    ta: 'தமிழ்',
+    sa: 'संस्कृतम्',
   };
 
   return (
@@ -41,10 +45,14 @@ export function Header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Select Language</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as 'en' | 'hi' | 'mr')}>
+          <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as Language)}>
             <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="hi">हिन्दी</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="mr">मराठी</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="kn">ಕನ್ನಡ</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="te">తెలుగు</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="ta">தமிழ்</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="sa">संस्कृतम्</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
