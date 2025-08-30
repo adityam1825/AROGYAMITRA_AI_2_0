@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -39,8 +40,26 @@ const content = {
 };
 
 const festivals = [
-  { date: new Date(2024, 8, 7), name: 'Ganesh Chaturthi' },
-  { date: new Date(2024, 10, 1), name: 'Diwali' },
+    { date: new Date(2024, 0, 15), name: 'Makar Sankranti' },
+    { date: new Date(2024, 0, 26), name: 'Republic Day' },
+    { date: new Date(2024, 1, 14), name: 'Vasant Panchami' },
+    { date: new Date(2024, 2, 8), name: 'Maha Shivaratri' },
+    { date: new Date(2024, 2, 25), name: 'Holi' },
+    { date: new Date(2024, 3, 11), name: 'Eid-ul-Fitr' },
+    { date: new Date(2024, 3, 17), name: 'Rama Navami' },
+    { date: new Date(2024, 4, 23), name: 'Buddha Purnima' },
+    { date: new Date(2024, 5, 17), name: 'Eid al-Adha' },
+    { date: new Date(2024, 6, 7), name: 'Rath Yatra' },
+    { date: new Date(2024, 7, 15), name: 'Independence Day' },
+    { date: new Date(2024, 7, 19), name: 'Raksha Bandhan' },
+    { date: new Date(2024, 7, 26), name: 'Janmashtami' },
+    { date: new Date(2024, 8, 7), name: 'Ganesh Chaturthi' },
+    { date: new Date(2024, 8, 15), name: 'Onam' },
+    { date: new Date(2024, 9, 3), name: 'Navaratri' },
+    { date: new Date(2024, 9, 12), name: 'Dussehra' },
+    { date: new Date(2024, 10, 1), name: 'Diwali' },
+    { date: new Date(2024, 10, 15), name: 'Guru Nanak Jayanti' },
+    { date: new Date(2024, 11, 25), name: 'Christmas' },
 ];
 
 export function FestivalCalendar({ selectedDate, onDateChange }: { selectedDate: Date; onDateChange: (date: Date) => void }) {
