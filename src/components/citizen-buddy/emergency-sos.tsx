@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Siren, Loader2, HeartPulse, Shield, Flame } from 'lucide-react';
+import { Siren, Loader2, HeartPulse, Shield, Flame } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,10 +14,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/context/language-context';
+import { cn } from '@/lib/utils';
 
 type EmergencyService = 'Ambulance' | 'Police' | 'Fire';
 
@@ -154,16 +154,17 @@ const EmergencyButton = ({
   icon: React.ElementType;
   onActivate: (service: EmergencyService, serviceText: string) => void;
 }) => (
-  <Button
-    variant="destructive"
-    size="lg"
-    className="w-full flex-1"
+  <button
     onClick={() => onActivate(service, serviceText)}
+    className={cn(
+        "flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-transparent bg-destructive/10 p-4 text-destructive transition-all hover:border-destructive hover:bg-destructive/20 focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2",
+    )}
   >
-    <Icon className="mr-2 h-5 w-5" />
-    {serviceText}
-  </Button>
+    <Icon className="h-10 w-10" />
+    <span className="text-lg font-semibold">{serviceText}</span>
+  </button>
 );
+
 
 export function EmergencySOS() {
   const { language } = useLanguage();
@@ -227,7 +228,7 @@ export function EmergencySOS() {
         <CardDescription>{t.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-3 gap-4">
             <EmergencyButton service="Ambulance" serviceText={t.ambulance} icon={HeartPulse} onActivate={handleActivate} />
             <EmergencyButton service="Police" serviceText={t.police} icon={Shield} onActivate={handleActivate} />
             <EmergencyButton service="Fire" serviceText={t.fire} icon={Flame} onActivate={handleActivate} />
@@ -242,9 +243,11 @@ export function EmergencySOS() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isLocating}>{t.cancel}</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmSOS} disabled={isLocating}>
-                 {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {isLocating ? t.sending(dialogState.serviceText) : t.confirm}
+              <AlertDialogAction asChild>
+                <Button variant="destructive" onClick={handleConfirmSOS} disabled={isLocating}>
+                    {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {isLocating ? t.sending(dialogState.serviceText) : t.confirm}
+                </Button>
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
