@@ -125,7 +125,6 @@ export function PersonalizedAdvisories() {
   const t = content[language];
   const [advisory, setAdvisory] = useState<GeneratePersonalizedAdvisoryOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -138,10 +137,28 @@ export function PersonalizedAdvisories() {
     }
 
     const result = await getPersonalizedAdvisory({ city, language });
-    setIsLoading(false);
+    
 
     if (result.success && result.data) {
-      setAdvisory(result.data);
+      const advisoryData = result.data;
+      const textToSpeak = `
+        ${t.surgeAdvisory}: ${advisoryData.surgeAdvisory}.
+        ${t.aqiAdvisory}: ${advisoryData.aqiAdvisory}.
+        ${t.eventAdvisory}: ${advisoryData.eventAdvisory}.
+      `;
+      
+      const speechResult = await generateSpeech({ text: textToSpeak, language });
+      if (speechResult.success && speechResult.data) {
+        advisoryData.audio = speechResult.data.audio;
+      } else {
+        toast({
+          variant: "destructive",
+          title: t.audioGenerationFailed,
+          description: speechResult.error,
+        });
+      }
+
+      setAdvisory(advisoryData);
       toast({
         title: t.advisoryGenerated,
         description: t.analysisComplete,
@@ -154,38 +171,21 @@ export function PersonalizedAdvisories() {
         description: result.error || "An unknown error occurred.",
       })
     }
+    setIsLoading(false);
   };
   
-  const handleListen = async () => {
+  const handleListen = () => {
     if (audioPlayer) {
       audioPlayer.pause();
       setAudioPlayer(null);
       return;
     }
 
-    if (!advisory) return;
-
-    setIsGeneratingAudio(true);
-    const textToSpeak = `
-      ${t.surgeAdvisory}: ${advisory.surgeAdvisory}.
-      ${t.aqiAdvisory}: ${advisory.aqiAdvisory}.
-      ${t.eventAdvisory}: ${advisory.eventAdvisory}.
-    `;
-
-    const result = await generateSpeech({ text: textToSpeak, language });
-    setIsGeneratingAudio(false);
-
-    if (result.success && result.data) {
-      const audio = new Audio(result.data.audio);
+    if (advisory?.audio) {
+      const audio = new Audio(advisory.audio);
       setAudioPlayer(audio);
       audio.play();
       audio.onended = () => setAudioPlayer(null);
-    } else {
-      toast({
-        variant: "destructive",
-        title: t.audioGenerationFailed,
-        description: result.error,
-      });
     }
   };
 
@@ -220,8 +220,8 @@ export function PersonalizedAdvisories() {
         {advisory && (
           <div className="space-y-4">
             <div className='flex items-center justify-end'>
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={isGeneratingAudio}>
-                    {isGeneratingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={!advisory.audio}>
+                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
                     {audioPlayer ? t.stop : t.listen}
                 </Button>
             </div>

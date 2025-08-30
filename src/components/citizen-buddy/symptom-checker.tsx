@@ -138,7 +138,6 @@ export function SymptomChecker() {
   const [age, setAge] = useState('');
   const [guidance, setGuidance] = useState<SymptomCheckerOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -156,10 +155,25 @@ export function SymptomChecker() {
         language,
         age: age ? parseInt(age, 10) : undefined,
     });
-    setIsLoading(false);
-
+    
     if (result.success && result.data) {
-      setGuidance(result.data);
+      const guidanceData = result.data;
+      const textToSpeak = `
+        ${t.aiGuidance}: ${guidanceData.guidance}.
+        ${t.medicationSuggestions}: ${guidanceData.medicationSuggestions}.
+        ${guidanceData.disclaimer}.
+      `;
+      const speechResult = await generateSpeech({ text: textToSpeak, language });
+      if (speechResult.success && speechResult.data) {
+        guidanceData.audio = speechResult.data.audio;
+      } else {
+        toast({
+            variant: "destructive",
+            title: t.audioGenerationFailed,
+            description: speechResult.error,
+        });
+      }
+      setGuidance(guidanceData);
     } else {
       console.error(result.error);
        toast({
@@ -168,38 +182,21 @@ export function SymptomChecker() {
         description: result.error || "An unknown error occurred.",
       })
     }
+    setIsLoading(false);
   };
   
-  const handleListen = async () => {
+  const handleListen = () => {
     if (audioPlayer) {
       audioPlayer.pause();
       setAudioPlayer(null);
       return;
     }
 
-    if (!guidance) return;
-    
-    setIsGeneratingAudio(true);
-    const textToSpeak = `
-      ${t.aiGuidance}: ${guidance.guidance}.
-      ${t.medicationSuggestions}: ${guidance.medicationSuggestions}.
-      ${guidance.disclaimer}.
-    `;
-
-    const result = await generateSpeech({ text: textToSpeak, language });
-    setIsGeneratingAudio(false);
-
-    if (result.success && result.data) {
-      const audio = new Audio(result.data.audio);
+    if (guidance?.audio) {
+      const audio = new Audio(guidance.audio);
       setAudioPlayer(audio);
       audio.play();
       audio.onended = () => setAudioPlayer(null);
-    } else {
-      toast({
-        variant: "destructive",
-        title: t.audioGenerationFailed,
-        description: result.error,
-      });
     }
   };
 
@@ -260,8 +257,8 @@ export function SymptomChecker() {
         {guidance && (
           <div className="space-y-4">
              <div className="flex items-center justify-end">
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={isGeneratingAudio}>
-                    {isGeneratingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={!guidance.audio}>
+                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
                     {audioPlayer ? t.stop : t.listen}
                 </Button>
             </div>

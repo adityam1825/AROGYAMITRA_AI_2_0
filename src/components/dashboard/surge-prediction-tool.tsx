@@ -125,7 +125,6 @@ export function SurgePredictionTool() {
   const t = content[language];
   const [prediction, setPrediction] = useState<GenerateSurgePredictionsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -138,10 +137,26 @@ export function SurgePredictionTool() {
     }
 
     const result = await getSurgePredictions({ city, language });
-    setIsLoading(false);
 
     if (result.success && result.data) {
-      setPrediction(result.data);
+      const predictionData = result.data;
+      const textToSpeak = `
+        ${t.predictedSurge}: ${predictionData.predictedSurge}.
+        ${t.confidenceLevel}: ${predictionData.confidenceLevel}.
+        ${t.recommendations}: ${predictionData.recommendations}.
+      `;
+      const speechResult = await generateSpeech({ text: textToSpeak, language });
+      if(speechResult.success && speechResult.data) {
+        predictionData.audio = speechResult.data.audio;
+      } else {
+        toast({
+            variant: "destructive",
+            title: t.audioGenerationFailed,
+            description: speechResult.error,
+        });
+      }
+
+      setPrediction(predictionData);
       toast({
         title: t.predictionGenerated,
         description: t.analysisComplete,
@@ -154,38 +169,21 @@ export function SurgePredictionTool() {
         description: result.error || "An unknown error occurred.",
       })
     }
+     setIsLoading(false);
   };
 
-  const handleListen = async () => {
+  const handleListen = () => {
     if (audioPlayer) {
       audioPlayer.pause();
       setAudioPlayer(null);
       return;
     }
 
-    if (!prediction) return;
-    
-    setIsGeneratingAudio(true);
-    const textToSpeak = `
-      ${t.predictedSurge}: ${prediction.predictedSurge}.
-      ${t.confidenceLevel}: ${prediction.confidenceLevel}.
-      ${t.recommendations}: ${prediction.recommendations}.
-    `;
-
-    const result = await generateSpeech({ text: textToSpeak, language });
-    setIsGeneratingAudio(false);
-
-    if (result.success && result.data) {
-      const audio = new Audio(result.data.audio);
+    if (prediction?.audio) {
+      const audio = new Audio(prediction.audio);
       setAudioPlayer(audio);
       audio.play();
       audio.onended = () => setAudioPlayer(null);
-    } else {
-      toast({
-        variant: "destructive",
-        title: t.audioGenerationFailed,
-        description: result.error,
-      });
     }
   };
 
@@ -246,8 +244,8 @@ export function SurgePredictionTool() {
                     <Zap className="w-5 h-5 text-primary"/>
                     <CardTitle className="text-md font-medium">{t.recommendations}</CardTitle>
                  </div>
-                 <Button onClick={handleListen} size="sm" variant="outline" disabled={isGeneratingAudio}>
-                    {isGeneratingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                 <Button onClick={handleListen} size="sm" variant="outline" disabled={!prediction.audio}>
+                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
                     {audioPlayer ? t.stop : t.listen}
                 </Button>
               </CardHeader>
