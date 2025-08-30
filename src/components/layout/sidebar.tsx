@@ -7,9 +7,34 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, HeartPulse } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/context/language-context';
+
+const content = {
+  en: {
+    dashboard: "Dashboard",
+  },
+  hi: {
+    dashboard: "डैशबोर्ड",
+  },
+  mr: {
+    dashboard: "डॅशबोर्ड",
+  },
+  kn: {
+    dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+  },
+  te: {
+    dashboard: "డాష్‌బోర్డ్",
+  },
+  ta: {
+    dashboard: "டாஷ்போர்டு",
+  },
+  sa: {
+    dashboard: "उपकरणपटलम्",
+  },
+};
 
 const LogoIcon = () => (
   <svg
@@ -29,6 +54,8 @@ const LogoIcon = () => (
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { language } = useLanguage();
+  const t = content[language];
 
   return (
     <>
@@ -44,11 +71,11 @@ export function AppSidebar() {
             <SidebarMenuButton
               asChild
               isActive={pathname === '/'}
-              tooltip="Dashboard"
+              tooltip={t.dashboard}
             >
               <Link href="/">
                 <LayoutDashboard />
-                <span>Dashboard</span>
+                <span>{t.dashboard}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
