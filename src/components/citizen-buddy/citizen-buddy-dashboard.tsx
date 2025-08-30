@@ -7,6 +7,7 @@ import { EmergencySOS } from "./emergency-sos";
 import { MedicationReminders } from "./medication-reminders";
 import { FindHospitals } from "./find-hospitals";
 import { BookAppointment } from "./book-appointment";
+import { CitizenHealthBuddy } from "./citizen-health-buddy";
 
 const content = {
     en: {
@@ -44,6 +45,7 @@ export function CitizenBuddyDashboard() {
         </h1>
       </div>
       <div className="space-y-6">
+        <CitizenHealthBuddy />
         <PersonalizedAdvisories />
         <div className="grid md:grid-cols-2 gap-6 items-stretch">
             <SymptomChecker />

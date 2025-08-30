@@ -20,6 +20,10 @@ import {
   type SymptomCheckerInput,
   type SymptomCheckerOutput,
 } from '@/ai/flows/symptom-checker-flow';
+import {
+  citizenHealthBuddy
+} from '@/ai/flows/citizen-health-buddy-flow';
+import type { CitizenHealthBuddyInput, CitizenHealthBuddyOutput } from '@/ai/schemas';
 
 
 export async function getSurgePredictions(input: GenerateSurgePredictionsInput): Promise<{
@@ -95,5 +99,25 @@ export async function getSymptomGuidance(input: SymptomCheckerInput): Promise<{
         }
 
         return { success: false, error: `Failed to generate guidance: ${errorMessage}` };
+    }
+}
+
+export async function getHealthBuddyResponse(input: CitizenHealthBuddyInput): Promise<{
+    success: boolean;
+    data?: CitizenHealthBuddyOutput;
+    error?: string;
+}> {
+    try {
+        const result = await citizenHealthBuddy(input);
+        return { success: true, data: result };
+    } catch (error) {
+        console.error("Error generating health buddy response:", error);
+        
+        let errorMessage = 'An unknown error occurred.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return { success: false, error: `Failed to generate response: ${errorMessage}` };
     }
 }
