@@ -27,7 +27,7 @@ const GeneratePersonalizedAdvisoryOutputSchema = z.object({
   surgeAdvisory: z.string().describe('Health advisory related to hospital patient surges.'),
   aqiAdvisory: z.string().describe('Health advisory related to air quality index (AQI).'),
   eventAdvisory: z.string().describe('Health advisory related to upcoming major public events.'),
-  audio: z.string().describe('The base64 encoded WAV audio data URI for the combined advisory.'),
+  audio: z.string().optional().describe('The base64 encoded WAV audio data URI for the combined advisory.'),
 });
 
 export type GeneratePersonalizedAdvisoryOutput = z.infer<
@@ -61,33 +61,6 @@ const advisoryPrompt = ai.definePrompt({
 `,
 });
 
-async function toWav(
-  pcmData: Buffer,
-  channels = 1,
-  rate = 24000,
-  sampleWidth = 2
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const writer = new wav.Writer({
-      channels,
-      sampleRate: rate,
-      bitDepth: sampleWidth * 8,
-    });
-
-    const bufs: any[] = [];
-    writer.on('error', reject);
-    writer.on('data', function (d) {
-      bufs.push(d);
-    });
-    writer.on('end', function () {
-      resolve(Buffer.concat(bufs).toString('base64'));
-    });
-
-    writer.write(pcmData);
-    writer.end();
-  });
-}
-
 const generatePersonalizedAdvisoryFlow = ai.defineFlow(
   {
     name: 'generatePersonalizedAdvisoryFlow',
@@ -95,41 +68,10 @@ const generatePersonalizedAdvisoryFlow = ai.defineFlow(
     outputSchema: GeneratePersonalizedAdvisoryOutputSchema,
   },
   async (input) => {
-    const {output: textOutput} = await advisoryPrompt(input);
-    if (!textOutput) {
+    const {output} = await advisoryPrompt(input);
+    if (!output) {
         throw new Error("Failed to generate text advisory.");
     }
-    
-    const combinedText = `
-        Hospital Surge Advisory: ${textOutput.surgeAdvisory}.
-        Air Quality Advisory: ${textOutput.aqiAdvisory}.
-        Public Event Advisory: ${textOutput.eventAdvisory}.
-    `;
-
-    // Sanskrit 'sa' is not supported by the TTS model, fallback to Hindi 'hi'.
-    const speechLanguage = input.language === 'sa' ? 'hi' : input.language;
-
-    const { media } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-preview-tts',
-      config: {
-        responseModalities: ['AUDIO'],
-      },
-      prompt: combinedText,
-    });
-
-    if (!media || !media.url) {
-      throw new Error('No audio media returned from the model.');
-    }
-
-    const audioBuffer = Buffer.from(
-      media.url.substring(media.url.indexOf(',') + 1),
-      'base64'
-    );
-    const wavData = await toWav(audioBuffer);
-
-    return {
-        ...textOutput,
-        audio: 'data:audio/wav;base64,' + wavData,
-    };
+    return output;
   }
 );

@@ -9,7 +9,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import wav from 'wav';
 
 const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa']);
 
@@ -39,6 +38,7 @@ const SymptomCheckerOutputSchema = z.object({
     ),
   audio: z
     .string()
+    .optional()
     .describe('The base64 encoded WAV audio data URI for the guidance.'),
 });
 export type SymptomCheckerOutput = z.infer<typeof SymptomCheckerOutputSchema>;
@@ -78,33 +78,6 @@ const guidancePrompt = ai.definePrompt({
   `,
 });
 
-async function toWav(
-  pcmData: Buffer,
-  channels = 1,
-  rate = 24000,
-  sampleWidth = 2
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const writer = new wav.Writer({
-      channels,
-      sampleRate: rate,
-      bitDepth: sampleWidth * 8,
-    });
-
-    const bufs: any[] = [];
-    writer.on('error', reject);
-    writer.on('data', function (d) {
-      bufs.push(d);
-    });
-    writer.on('end', function () {
-      resolve(Buffer.concat(bufs).toString('base64'));
-    });
-
-    writer.write(pcmData);
-    writer.end();
-  });
-}
-
 const symptomCheckerFlow = ai.defineFlow(
   {
     name: 'symptomCheckerFlow',
@@ -112,41 +85,10 @@ const symptomCheckerFlow = ai.defineFlow(
     outputSchema: SymptomCheckerOutputSchema,
   },
   async (input) => {
-    const { output: textOutput } = await guidancePrompt(input);
-    if (!textOutput) {
+    const { output } = await guidancePrompt(input);
+    if (!output) {
       throw new Error('Failed to generate text guidance.');
     }
-
-    const combinedText = `
-      Guidance: ${textOutput.guidance}.
-      Suggested Medications: ${textOutput.medicationSuggestions}.
-      Important Disclaimer: ${textOutput.disclaimer}.
-    `;
-
-    // Sanskrit 'sa' is not supported by the TTS model, fallback to Hindi 'hi'.
-    const speechLanguage = input.language === 'sa' ? 'hi' : input.language;
-
-    const { media } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-preview-tts',
-      config: {
-        responseModalities: ['AUDIO'],
-      },
-      prompt: combinedText,
-    });
-
-    if (!media || !media.url) {
-      throw new Error('No audio media returned from the model.');
-    }
-
-    const audioBuffer = Buffer.from(
-      media.url.substring(media.url.indexOf(',') + 1),
-      'base64'
-    );
-    const wavData = await toWav(audioBuffer);
-
-    return {
-      ...textOutput,
-      audio: 'data:audio/wav;base64,' + wavData,
-    };
+    return output;
   }
 );

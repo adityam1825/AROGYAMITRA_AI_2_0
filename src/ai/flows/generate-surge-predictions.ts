@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import wav from 'wav';
 
 const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa']);
 
@@ -37,7 +36,7 @@ const GenerateSurgePredictionsOutputSchema = z.object({
     .describe(
       'Recommendations for resource allocation and staffing based on the predicted surge.'
     ),
-  audio: z.string().describe('The base64 encoded WAV audio data URI for the prediction summary.'),
+  audio: z.string().optional().describe('The base64 encoded WAV audio data URI for the prediction summary.'),
 });
 
 export type GenerateSurgePredictionsOutput = z.infer<
@@ -69,32 +68,6 @@ const prompt = ai.definePrompt({
 `,
 });
 
-async function toWav(
-  pcmData: Buffer,
-  channels = 1,
-  rate = 24000,
-  sampleWidth = 2
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const writer = new wav.Writer({
-      channels,
-      sampleRate: rate,
-      bitDepth: sampleWidth * 8,
-    });
-
-    const bufs: any[] = [];
-    writer.on('error', reject);
-    writer.on('data', function (d) {
-      bufs.push(d);
-    });
-    writer.on('end', function () {
-      resolve(Buffer.concat(bufs).toString('base64'));
-    });
-
-    writer.write(pcmData);
-    writer.end();
-  });
-}
 
 const generateSurgePredictionsFlow = ai.defineFlow(
   {
@@ -103,38 +76,10 @@ const generateSurgePredictionsFlow = ai.defineFlow(
     outputSchema: GenerateSurgePredictionsOutputSchema,
   },
   async (input) => {
-    const {output: textOutput} = await prompt(input);
-    if (!textOutput) {
+    const {output} = await prompt(input);
+    if (!output) {
         throw new Error("Failed to generate text prediction.");
     }
-    
-    const predictionText = `
-        Prediction: ${textOutput.predictedSurge}.
-        Confidence Level: ${textOutput.confidenceLevel}.
-        Recommendations: ${textOutput.recommendations}
-    `;
-
-    const { media } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-preview-tts',
-      config: {
-        responseModalities: ['AUDIO'],
-      },
-      prompt: predictionText,
-    });
-
-    if (!media || !media.url) {
-      throw new Error('No audio media returned from the model.');
-    }
-
-    const audioBuffer = Buffer.from(
-      media.url.substring(media.url.indexOf(',') + 1),
-      'base64'
-    );
-    const wavData = await toWav(audioBuffer);
-
-    return {
-        ...textOutput,
-        audio: 'data:audio/wav;base64,' + wavData,
-    };
+    return output;
   }
 );
