@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Siren, Loader2 } from 'lucide-react';
+import { AlertTriangle, Siren, Loader2, HeartPulse, Shield, Flame } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,135 +19,181 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/context/language-context';
 
+type EmergencyService = 'Ambulance' | 'Police' | 'Fire';
+
 const content = {
   en: {
-    title: "Emergency SOS",
-    description: "Alert authorities and designated contacts in an emergency. Your location will be shared.",
-    activateSOS: "Activate SOS",
-    confirmTitle: "Confirm Emergency SOS",
-    confirmDescription: "This action will immediately alert emergency services with your current location. Are you sure you want to proceed?",
+    title: "Emergency Services",
+    description: "Alert authorities in an emergency. Your location will be shared automatically.",
+    ambulance: "Ambulance",
+    police: "Police",
+    fire: "Fire Dept.",
+    confirmTitle: (service: string) => `Confirm Call for ${service}`,
+    confirmDescription: (service: string) => `This will immediately alert the ${service} with your location. Are you sure?`,
     cancel: "Cancel",
-    confirm: "Yes, I need help",
-    sending: "Sending SOS...",
-    sosSent: "SOS Sent",
-    sosSentDesc: "Emergency services have been notified of your location. Help is on the way.",
+    confirm: "Yes, I Need Help",
+    sending: (service: string) => `Contacting ${service}...`,
+    sosSent: (service: string) => `${service} Notified`,
+    sosSentDesc: (service: string) => `The ${service} has been notified of your location. Help is on the way.`,
     locationError: "Location Error",
     couldNotAccess: "Could not access your location. Please enable location services.",
     geolocationUnsupported: "Geolocation is not supported by your browser.",
   },
   hi: {
-    title: "आपातकालीन एसओएस",
-    description: "आपात स्थिति में अधिकारियों और निर्दिष्ट संपर्कों को सचेत करें। आपका स्थान साझा किया जाएगा।",
-    activateSOS: "एसओएस सक्रिय करें",
-    confirmTitle: "आपातकालीन एसओएस की पुष्टि करें",
-    confirmDescription: "यह कार्रवाई तुरंत आपके वर्तमान स्थान के साथ आपातकालीन सेवाओं को सचेत करेगी। क्या आप वाकई आगे बढ़ना चाहते हैं?",
+    title: "आपातकालीन सेवाएं",
+    description: "आपात स्थिति में अधिकारियों को सचेत करें। आपका स्थान स्वचालित रूप से साझा किया जाएगा।",
+    ambulance: "एम्बुलेंस",
+    police: "पुलिस",
+    fire: "अग्निशमन विभाग",
+    confirmTitle: (service: string) => `${service} के लिए कॉल की पुष्टि करें`,
+    confirmDescription: (service: string) => `यह तुरंत आपके स्थान के साथ ${service} को सचेत करेगा। क्या आप निश्चित हैं?`,
     cancel: "रद्द करें",
     confirm: "हाँ, मुझे मदद चाहिए",
-    sending: "एसओएस भेजा जा रहा है...",
-    sosSent: "एसओएस भेजा गया",
-    sosSentDesc: "आपातकालीन सेवाओं को आपके स्थान की सूचना दे दी गई है। मदद रास्ते में है।",
+    sending: (service: string) => `${service} से संपर्क किया जा रहा है...`,
+    sosSent: (service: string) => `${service} को सूचित किया गया`,
+    sosSentDesc: (service: string) => `${service} को आपके स्थान की सूचना दे दी गई है। मदद रास्ते में है।`,
     locationError: "स्थान त्रुटि",
     couldNotAccess: "आपके स्थान तक नहीं पहुंच सका। कृपया स्थान सेवाएं सक्षम करें।",
     geolocationUnsupported: "आपके ब्राउज़र द्वारा जियोलोकेशन समर्थित नहीं है।",
   },
   mr: {
-    title: "आपत्कालीन एसओएस",
-    description: "आणीबाणीच्या परिस्थितीत अधिकारी आणि नियुक्त संपर्कांना सतर्क करा. तुमचे स्थान शेअर केले जाईल.",
-    activateSOS: "एसओएस सक्रिय करा",
-    confirmTitle: "आपत्कालीन एसओएसची पुष्टी करा",
-    confirmDescription: "ही कृती तुमच्या वर्तमान स्थानासह आपत्कालीन सेवांना त्वरित सतर्क करेल. तुम्हाला खात्री आहे की तुम्ही पुढे जाऊ इच्छिता?",
+    title: "आपत्कालीन सेवा",
+    description: "आणीबाणीच्या परिस्थितीत अधिकाऱ्यांना सतर्क करा. तुमचे स्थान आपोआप शेअर केले जाईल.",
+    ambulance: "रुग्णवाहिका",
+    police: "पोलीस",
+    fire: "अग्निशमन दल",
+    confirmTitle: (service: string) => `${service} साठी कॉलची पुष्टी करा`,
+    confirmDescription: (service: string) => `हे तुमच्या स्थानासह ${service} ला त्वरित सतर्क करेल. तुम्हाला खात्री आहे का?`,
     cancel: "रद्द करा",
     confirm: "होय, मला मदतीची गरज आहे",
-    sending: "एसओएस पाठवत आहे...",
-    sosSent: "एसओएस पाठवले",
-    sosSentDesc: "आपत्कालीन सेवांना तुमच्या स्थानाची सूचना देण्यात आली आहे. मदत मार्गावर आहे.",
+    sending: (service: string) => `${service} शी संपर्क साधत आहे...`,
+    sosSent: (service: string) => `${service} ला सूचित केले`,
+    sosSentDesc: (service: string) => `${service} ला तुमच्या स्थानाची सूचना देण्यात आली आहे. मदत मार्गावर आहे.`,
     locationError: "स्थान त्रुटी",
     couldNotAccess: "तुमच्या स्थानावर प्रवेश करू शकलो नाही. कृपया स्थान सेवा सक्षम करा.",
     geolocationUnsupported: "तुमच्या ब्राउझरद्वारे भौगोलिक स्थान समर्थित नाही.",
   },
   kn: {
-    title: "ತುರ್ತು ಎಸ್‌ಒಎಸ್",
-    description: "ತುರ್ತು ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ಅಧಿಕಾರಿಗಳು ಮತ್ತು ಗೊತ್ತುಪಡಿಸಿದ ಸಂಪರ್ಕಗಳನ್ನು ಎಚ್ಚರಿಸಿ. ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹಂಚಿಕೊಳ್ಳಲಾಗುತ್ತದೆ.",
-    activateSOS: "ಎಸ್‌ಒಎಸ್ ಸಕ್ರಿಯಗೊಳಿಸಿ",
-    confirmTitle: "ತುರ್ತು ಎಸ್‌ಒಎಸ್ ಅನ್ನು ದೃಢೀಕರಿಸಿ",
-    confirmDescription: "ಈ ಕ್ರಿಯೆಯು ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಸ್ಥಳದೊಂದಿಗೆ ತುರ್ತು ಸೇವೆಗಳನ್ನು ತಕ್ಷಣವೇ ಎಚ್ಚರಿಸುತ್ತದೆ. ನೀವು ಮುಂದುವರಿಯಲು ಖಚಿತವಾಗಿದ್ದೀರಾ?",
+    title: "ತುರ್ತು ಸೇವೆಗಳು",
+    description: "ತುರ್ತು ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ಅಧಿಕಾರಿಗಳನ್ನು ಎಚ್ಚರಿಸಿ. ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಹಂಚಿಕೊಳ್ಳಲಾಗುತ್ತದೆ.",
+    ambulance: "ಆಂಬ್ಯುಲೆನ್ಸ್",
+    police: "ಪೋಲೀಸ್",
+    fire: "ಅಗ್ನಿಶಾಮಕ ಇಲಾಖೆ",
+    confirmTitle: (service: string) => `${service} ಗೆ ಕರೆ ದೃಢೀಕರಿಸಿ`,
+    confirmDescription: (service: string) => `ಇದು ತಕ್ಷಣವೇ ನಿಮ್ಮ ಸ್ಥಳದೊಂದಿಗೆ ${service} ಅನ್ನು ಎಚ್ಚರಿಸುತ್ತದೆ. ನಿಮಗೆ ಖಚಿತವೇ?`,
     cancel: "ರದ್ದುಮಾಡಿ",
     confirm: "ಹೌದು, ನನಗೆ ಸಹಾಯ ಬೇಕು",
-    sending: "ಎಸ್‌ಒಎಸ್ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ...",
-    sosSent: "ಎಸ್‌ಒಎಸ್ ಕಳುಹಿಸಲಾಗಿದೆ",
-    sosSentDesc: "ನಿಮ್ಮ ಸ್ಥಳದ ಬಗ್ಗೆ ತುರ್ತು ಸೇವೆಗಳಿಗೆ ತಿಳಿಸಲಾಗಿದೆ. ಸಹಾಯ ದಾರಿಯಲ್ಲಿದೆ.",
+    sending: (service: string) => `${service} ಅನ್ನು ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ...`,
+    sosSent: (service: string) => `${service} ಗೆ ಸೂಚಿಸಲಾಗಿದೆ`,
+    sosSentDesc: (service: string) => `ನಿಮ್ಮ ಸ್ಥಳದ ಬಗ್ಗೆ ${service} ಗೆ ತಿಳಿಸಲಾಗಿದೆ. ಸಹಾಯ ದಾರಿಯಲ್ಲಿದೆ.`,
     locationError: "ಸ್ಥಳ ದೋಷ",
     couldNotAccess: "ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಪ್ರವೇಶಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
     geolocationUnsupported: "ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಿಂದ ಜಿಯೋಲೊಕೇಶನ್ ಬೆಂಬಲಿತವಾಗಿಲ್ಲ.",
   },
   te: {
-    title: "అత్యవసర SOS",
-    description: "అత్యవసర పరిస్థితిలో అధికారులు మరియు నిర్దేశించిన పరిచయాలను అప్రమత్తం చేయండి. మీ స్థానం భాగస్వామ్యం చేయబడుతుంది.",
-    activateSOS: "SOSను సక్రియం చేయండి",
-    confirmTitle: "అత్యవసర SOSను నిర్ధారించండి",
-    confirmDescription: "ఈ చర్య మీ ప్రస్తుత స్థానంతో అత్యవసర సేవలను తక్షణమే అప్రమత్తం చేస్తుంది. మీరు కొనసాగాలనుకుంటున్నారని ఖచ్చితంగా ఉన్నారా?",
+    title: "అత్యవసర సేవలు",
+    description: "అత్యవసర పరిస్థితిలో అధికారులను అప్రమత్తం చేయండి. మీ స్థానం స్వయంచాలకంగా భాగస్వామ్యం చేయబడుతుంది.",
+    ambulance: "అంబులెన్స్",
+    police: "పోలీస్",
+    fire: "అగ్నిమాపక విభాగం",
+    confirmTitle: (service: string) => `${service} కోసం కాల్‌ని నిర్ధారించండి`,
+    confirmDescription: (service: string) => `ఇది తక్షణమే మీ స్థానంతో ${service} ను అప్రమత్తం చేస్తుంది. మీకు ఖచ్చితంగా తెలియజేయండి?`,
     cancel: "రద్దు చేయండి",
     confirm: "అవును, నాకు సహాయం కావాలి",
-    sending: "SOS పంపుతోంది...",
-    sosSent: "SOS పంపబడింది",
-    sosSentDesc: "మీ స్థానం గురించి అత్యవసర సేవలకు తెలియజేయబడింది. సహాయం దారిలో ఉంది.",
+    sending: (service: string) => `${service} ని సంప్రదిస్తోంది...`,
+    sosSent: (service: string) => `${service} కి తెలియజేయబడింది`,
+    sosSentDesc: (service: string) => `మీ స్థానం గురించి ${service} కి తెలియజేయబడింది. సహాయం దారిలో ఉంది.`,
     locationError: "స్థాన దోషం",
     couldNotAccess: "మీ స్థానాన్ని యాక్సెస్ చేయలేకపోయింది. దయచేసి స్థాన సేవలను ప్రారంభించండి.",
     geolocationUnsupported: "మీ బ్రౌజర్ ద్వారా జియోలోకేషన్ మద్దతు లేదు.",
   },
   ta: {
-    title: "அவசர எஸ்ஓஎஸ்",
-    description: "அவசரகாலத்தில் அதிகாரிகள் மற்றும் நியமிக்கப்பட்ட தொடர்புகளை எச்சரிக்கவும். உங்கள் இருப்பிடம் பகிரப்படும்.",
-    activateSOS: "எஸ்ஓஎஸ்ஸைச் செயல்படுத்தவும்",
-    confirmTitle: "அவசர எஸ்ஓஎஸ்ஸை உறுதிப்படுத்தவும்",
-    confirmDescription: "இந்த நடவடிக்கை உங்கள் தற்போதைய இருப்பிடத்துடன் அவசரகால சேவைகளை உடனடியாக எச்சரிக்கும். நீங்கள் தொடர விரும்புகிறீர்கள் என்பது உறுதியா?",
+    title: "அவசர சேவைகள்",
+    description: "அவசரகாலத்தில் அதிகாரிகளை எச்சரிக்கவும். உங்கள் இருப்பிடம் தானாகப் பகிரப்படும்.",
+    ambulance: "ஆம்புலன்ஸ்",
+    police: "காவல்துறை",
+    fire: "தீயணைப்புத் துறை",
+    confirmTitle: (service: string) => `${service} க்கான அழைப்பை உறுதிப்படுத்தவும்`,
+    confirmDescription: (service: string) => `இது உடனடியாக உங்கள் இருப்பிடத்துடன் ${service} ஐ எச்சரிக்கும். உங்களுக்கு உறுதியாக தெரியுமா?`,
     cancel: "ரத்துசெய்",
     confirm: "ஆம், எனக்கு உதவி தேவை",
-    sending: "எஸ்ஓஎஸ் அனுப்பப்படுகிறது...",
-    sosSent: "எஸ்ஓஎஸ் அனுப்பப்பட்டது",
-    sosSentDesc: "உங்கள் இருப்பிடம் குறித்து அவசரகால சேவைகளுக்கு அறிவிக்கப்பட்டுள்ளது. உதவி வழியில் உள்ளது.",
+    sending: (service: string) => `${service} ஐத் தொடர்புகொள்கிறது...`,
+    sosSent: (service: string) => `${service} க்கு அறிவிக்கப்பட்டது`,
+    sosSentDesc: (service: string) => `உங்கள் இருப்பிடம் குறித்து ${service} க்கு அறிவிக்கப்பட்டுள்ளது. உதவி வழியில் உள்ளது.`,
     locationError: "இருப்பிடப் பிழை",
     couldNotAccess: "உங்கள் இருப்பிடத்தை அணுக முடியவில்லை. இருப்பிடச் சேவைகளை இயக்கவும்.",
     geolocationUnsupported: "உங்கள் உலாவியால் புவிஇருப்பிடம் ஆதரிக்கப்படவில்லை.",
   },
   sa: {
-    title: "आपत्कालीनः एसओएस",
-    description: "आपत्काले अधिकारिणः निर्दिष्टसम्पर्कांश्च सूचयन्तु। भवतः स्थानं साझा भविष्यति।",
-    activateSOS: "एसओएस सक्रियं करोतु",
-    confirmTitle: "आपत्कालीनं एसओएस पुष्णातु",
-    confirmDescription: "एषा क्रिया भवतः वर्तमानस्थानेन सह आपत्कालीनसेवाः शीघ्रमेव सूचयिष्यति। किं भवान् अग्रे गन्तुं निश्चितः?",
+    title: "आपत्कालीनसेवाः",
+    description: "आपत्काले अधिकारिणः सूचयन्तु। भवतः स्थानं स्वचालितरूपेण साझा भविष्यति।",
+    ambulance: "रुग्णयानम्",
+    police: "आरक्षकः",
+    fire: "अग्निशमनविभागः",
+    confirmTitle: (service: string) => `${service} कृते आह्वानं पुष्णातु`,
+    confirmDescription: (service: string) => `एतत् शीघ्रमेव भवतः स्थानेन सह ${service} सूचयिष्यति। किं भवान् निश्चितः?`,
     cancel: "रद्दं करोतु",
     confirm: "आम्, मम साहाय्यम् आवश्यकम्",
-    sending: "एसओएस प्रेष्यते...",
-    sosSent: "एसओएस प्रेषितम्",
-    sosSentDesc: "भवतः स्थानस्य सूचना आपत्कालीनसेवाभ्यः दत्ता अस्ति। साहाय्यं मार्गे अस्ति।",
+    sending: (service: string) => `${service} सम्पर्कः क्रियते...`,
+    sosSent: (service: string) => `${service} सूचितः`,
+    sosSentDesc: (service: string) => `भवतः स्थानस्य सूचना ${service} दत्ता अस्ति। साहाय्यं मार्गे अस्ति।`,
     locationError: "स्थानत्रुटिः",
     couldNotAccess: "भवतः स्थानं प्राप्तुं न शक्तम्। कृपया स्थानसेवां चालयन्तु।",
     geolocationUnsupported: "भवतः ब्राउजरेण भौगोलिकस्थानं न समर्थितम्।",
   },
 };
 
+const EmergencyButton = ({
+  service,
+  serviceText,
+  icon: Icon,
+  onActivate,
+}: {
+  service: EmergencyService;
+  serviceText: string;
+  icon: React.ElementType;
+  onActivate: (service: EmergencyService, serviceText: string) => void;
+}) => (
+  <Button
+    variant="destructive"
+    size="lg"
+    className="w-full flex-1"
+    onClick={() => onActivate(service, serviceText)}
+  >
+    <Icon className="mr-2 h-5 w-5" />
+    {serviceText}
+  </Button>
+);
+
 export function EmergencySOS() {
   const { language } = useLanguage();
   const t = content[language];
   const { toast } = useToast();
   const [isLocating, setIsLocating] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [dialogState, setDialogState] = useState<{
+    isOpen: boolean;
+    service: EmergencyService | null;
+    serviceText: string;
+  }>({ isOpen: false, service: null, serviceText: '' });
+
+  const handleActivate = (service: EmergencyService, serviceText: string) => {
+    setDialogState({ isOpen: true, service, serviceText });
+  };
 
   const handleConfirmSOS = () => {
+    if (!dialogState.service) return;
+
     setIsLocating(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // In a real app, you would send coordinates to a backend.
-          // e.g., sendSOSToServer(position.coords.latitude, position.coords.longitude);
-          console.log(`SOS at: ${position.coords.latitude}, ${position.coords.longitude}`);
+          console.log(`${dialogState.service} SOS at: ${position.coords.latitude}, ${position.coords.longitude}`);
           toast({
-            title: t.sosSent,
-            description: t.sosSentDesc,
+            title: t.sosSent(dialogState.serviceText),
+            description: t.sosSentDesc(dialogState.serviceText),
           });
           setIsLocating(false);
-          setIsOpen(false);
+          setDialogState({ isOpen: false, service: null, serviceText: '' });
         },
         (error) => {
           console.error(error);
@@ -156,7 +203,7 @@ export function EmergencySOS() {
             description: t.couldNotAccess,
           });
           setIsLocating(false);
-          setIsOpen(false);
+          setDialogState({ isOpen: false, service: null, serviceText: '' });
         }
       );
     } else {
@@ -166,7 +213,7 @@ export function EmergencySOS() {
         description: t.geolocationUnsupported,
       });
       setIsLocating(false);
-      setIsOpen(false);
+      setDialogState({ isOpen: false, service: null, serviceText: '' });
     }
   };
 
@@ -174,33 +221,30 @@ export function EmergencySOS() {
     <Card className="h-full">
       <CardHeader>
         <div className="flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-destructive" />
+            <Siren className="h-6 w-6 text-destructive" />
             <CardTitle>{t.title}</CardTitle>
         </div>
         <CardDescription>{t.description}</CardDescription>
       </CardHeader>
       <CardContent>
-         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="lg" className="w-full">
-              <Siren className="mr-2 h-5 w-5" />
-              {t.activateSOS}
-            </Button>
-          </AlertDialogTrigger>
+        <div className="flex flex-col sm:flex-row gap-2">
+            <EmergencyButton service="Ambulance" serviceText={t.ambulance} icon={HeartPulse} onActivate={handleActivate} />
+            <EmergencyButton service="Police" serviceText={t.police} icon={Shield} onActivate={handleActivate} />
+            <EmergencyButton service="Fire" serviceText={t.fire} icon={Flame} onActivate={handleActivate} />
+        </div>
+        <AlertDialog open={dialogState.isOpen} onOpenChange={(isOpen) => setDialogState(prev => ({...prev, isOpen}))}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t.confirmTitle}</AlertDialogTitle>
+              <AlertDialogTitle>{t.confirmTitle(dialogState.serviceText)}</AlertDialogTitle>
               <AlertDialogDescription>
-                {t.confirmDescription}
+                {t.confirmDescription(dialogState.serviceText)}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isLocating}>{t.cancel}</AlertDialogCancel>
               <AlertDialogAction onClick={handleConfirmSOS} disabled={isLocating}>
-                 {isLocating ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                 ) : null}
-                {isLocating ? t.sending : t.confirm}
+                 {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {isLocating ? t.sending(dialogState.serviceText) : t.confirm}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
