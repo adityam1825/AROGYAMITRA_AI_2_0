@@ -14,8 +14,8 @@ body {
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 45 95% 55%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 45 95% 55%; /* Mango Yellow */
+    --primary-foreground: 24 9.8% 10%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 215.4 16.3% 46.9%;
     --muted: 210 40% 96.1%;
@@ -26,7 +26,7 @@ body {
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 45 95% 55%;
+    --ring: 45 95% 55%; /* Mango Yellow */
     --radius: 0.5rem;
     --chart-1: 36 90% 55%;
     --chart-2: 168 83% 53%;
@@ -37,45 +37,45 @@ body {
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 210 40% 98%;
     --sidebar-primary-foreground: 222.2 47.4% 11.2%;
-    --sidebar-accent: 260 80% 85%;
+    --sidebar-accent: 260 80% 85%; /* Light Purple */
     --sidebar-accent-foreground: 260 80% 15%;
     --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 262.1 83.3% 70%;
+    --sidebar-ring: 262.1 83.3% 70%; /* Light Purple */
   }
 
   .dark {
-    --background: 210 10% 40%;
+    --background: 220 14% 15%;
     --foreground: 210 40% 98%;
-    --card: 210 10% 40%;
+    --card: 220 14% 15%;
     --card-foreground: 210 40% 98%;
-    --popover: 210 10% 35%;
+    --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
-    --primary: 45 95% 55%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 210 10% 45%;
+    --primary: 45 95% 55%; /* Mango Yellow */
+    --primary-foreground: 24 9.8% 10%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 210 10% 45%;
+    --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 210 10% 45%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 210 10% 50%;
-    --input: 210 10% 50%;
-    --ring: 45 95% 55%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 45 95% 55%; /* Mango Yellow */
     --chart-1: 36 90% 55%;
     --chart-2: 168 83% 53%;
     --chart-3: 300 83% 53%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 210 10% 40%;
+    --sidebar-background: 220 14% 15%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 210 40% 98%;
     --sidebar-primary-foreground: 222.2 47.4% 11.2%;
-    --sidebar-accent: 260 80% 55%;
+    --sidebar-accent: 260 80% 55%; /* Light Purple */
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 210 10% 50%;
-    --sidebar-ring: 262.1 83.3% 70%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 262.1 83.3% 70%; /* Light Purple */
   }
 }
 
