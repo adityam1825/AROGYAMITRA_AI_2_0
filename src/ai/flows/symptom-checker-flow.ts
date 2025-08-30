@@ -32,6 +32,11 @@ const SymptomCheckerOutputSchema = z.object({
   disclaimer: z
     .string()
     .describe('A mandatory disclaimer that this is not medical advice.'),
+  medicationSearchQuery: z
+    .string()
+    .describe(
+      'A URL-encoded search query string based on the medication suggestions.'
+    ),
   audio: z
     .string()
     .describe('The base64 encoded WAV audio data URI for the guidance.'),
@@ -52,6 +57,7 @@ const guidancePrompt = ai.definePrompt({
       guidance: z.string(),
       medicationSuggestions: z.string(),
       disclaimer: z.string(),
+      medicationSearchQuery: z.string(),
     }),
   },
   prompt: `You are a helpful AI assistant providing basic health guidance. A user has described their symptoms and provided their age.
@@ -66,6 +72,7 @@ const guidancePrompt = ai.definePrompt({
   1.  **Guidance**: A short, one or two-sentence piece of general guidance.
   2.  **Medication Suggestions**: Suggest GENERAL CATEGORIES of over-the-counter (OTC) medications that may help relieve the symptoms. DO NOT suggest specific brand names, dosages, or frequencies. For example, suggest "pain relievers (analgesics)" instead of "Take 500mg Paracetamol every 6 hours". Mention that dosage should be as per the instructions on the package or by a doctor.
   3.  **Disclaimer**: A clear, mandatory disclaimer stating "This is not medical advice. Always consult a doctor or pharmacist before taking any medication." or its equivalent in the target language.
+  4.  **Medication Search Query**: Based on the medication categories suggested, create a URL-encoded search query. Extract only the key medical terms. For example, if you suggest "pain relievers (analgesics) and decongestants", the query should be "analgesics%20decongestants". Only include the search terms themselves.
 
   Generate only the structured output.
   `,

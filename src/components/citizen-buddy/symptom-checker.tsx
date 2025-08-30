@@ -251,7 +251,7 @@ export function SymptomChecker() {
                 <CardContent className='space-y-4'>
                     <p className="text-sm">{guidance.medicationSuggestions}</p>
                     <Button asChild className='w-full'>
-                        <Link href="https://www.1mg.com" target="_blank" rel="noopener noreferrer">
+                        <Link href={`https://www.1mg.com/search/all?name=${guidance.medicationSearchQuery}`} target="_blank" rel="noopener noreferrer">
                             <LinkIcon className="mr-2 h-4 w-4" />
                             {t.shopOnline}
                         </Link>
