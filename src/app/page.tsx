@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/features/dashboard/layout/header";
-import { AppSidebar } from "@/components/features/dashboard/layout/sidebar";
+import { Header } from "@/components/layout/header";
+import { AppSidebar } from "@/components/layout/sidebar";
 import {
   SidebarProvider,
   Sidebar,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import { OverviewCards } from "@/components/features/dashboard/overview-cards";
-import { SurgePredictionChart } from "@/components/features/dashboard/surge-prediction-chart";
-import { HealthAdvisories } from "@/components/features/dashboard/health-advisories";
-import { RecentAlerts } from "@/components/features/dashboard/recent-alerts";
-import { SurgePredictionTool } from "@/components/features/dashboard/surge-prediction-tool";
+import { OverviewCards } from "@/components/dashboard/overview-cards";
+import { SurgePredictionChart } from "@/components/dashboard/surge-prediction-chart";
+import { HealthAdvisories } from "@/components/dashboard/health-advisories";
+import { RecentAlerts } from "@/components/dashboard/recent-alerts";
+import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-tool";
 
 export const metadata: Metadata = {
   title: "Dashboard | SurgeGuard Mumbai",
