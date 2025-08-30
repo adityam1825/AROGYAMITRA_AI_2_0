@@ -72,22 +72,11 @@ export function FestivalCalendar({ selectedDate, onDateChange }: { selectedDate:
 
   const modifiersStyles = {
     festival: {
-      fontWeight: 'bold',
+      backgroundColor: 'hsl(var(--primary) / 0.1)',
       color: 'hsl(var(--primary))',
-      textDecoration: 'underline',
+      fontWeight: 'bold',
     },
   };
-
-  const renderDay = (day: Date) => {
-    const festival = festivals.find(f => isSameDay(f.date, day));
-    return (
-      <div className="relative flex items-center justify-center h-full w-full">
-        {day.getDate()}
-        {festival && <div className="absolute bottom-0.5 h-1 w-1 rounded-full bg-primary" />}
-      </div>
-    );
-  };
-  
 
   return (
     <Card>
@@ -102,7 +91,6 @@ export function FestivalCalendar({ selectedDate, onDateChange }: { selectedDate:
           onSelect={(date) => date && onDateChange(date)}
           modifiers={modifiers}
           modifiersStyles={modifiersStyles}
-          components={{ DayContent: (props) => renderDay(props.date) }}
         />
       </CardContent>
     </Card>

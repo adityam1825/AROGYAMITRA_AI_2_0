@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
@@ -57,10 +58,27 @@ const content = {
   },
 };
 
-// Dummy festival data for demonstration
 const festivals = [
-  { date: new Date(2024, 8, 7), name: 'Ganesh Chaturthi', admissionMultiplier: 1.5 }, // Sep 7
-  { date: new Date(2024, 10, 1), name: 'Diwali', admissionMultiplier: 1.8 }, // Nov 1
+    { date: new Date(2024, 0, 15), name: 'Makar Sankranti', admissionMultiplier: 1.1 },
+    { date: new Date(2024, 0, 26), name: 'Republic Day', admissionMultiplier: 1.2 },
+    { date: new Date(2024, 1, 14), name: 'Vasant Panchami', admissionMultiplier: 1.1 },
+    { date: new Date(2024, 2, 8), name: 'Maha Shivaratri', admissionMultiplier: 1.3 },
+    { date: new Date(2024, 2, 25), name: 'Holi', admissionMultiplier: 1.6 },
+    { date: new Date(2024, 3, 11), name: 'Eid-ul-Fitr', admissionMultiplier: 1.5 },
+    { date: new Date(2024, 3, 17), name: 'Rama Navami', admissionMultiplier: 1.3 },
+    { date: new Date(2024, 4, 23), name: 'Buddha Purnima', admissionMultiplier: 1.1 },
+    { date: new Date(2024, 5, 17), name: 'Eid al-Adha', admissionMultiplier: 1.5 },
+    { date: new Date(2024, 6, 7), name: 'Rath Yatra', admissionMultiplier: 1.4 },
+    { date: new Date(2024, 7, 15), name: 'Independence Day', admissionMultiplier: 1.2 },
+    { date: new Date(2024, 7, 19), name: 'Raksha Bandhan', admissionMultiplier: 1.3 },
+    { date: new Date(2024, 7, 26), name: 'Janmashtami', admissionMultiplier: 1.4 },
+    { date: new Date(2024, 8, 7), name: 'Ganesh Chaturthi', admissionMultiplier: 1.7 },
+    { date: new Date(2024, 8, 15), name: 'Onam', admissionMultiplier: 1.3 },
+    { date: new Date(2024, 9, 3), name: 'Navaratri', admissionMultiplier: 1.2 },
+    { date: new Date(2024, 9, 12), name: 'Dussehra', admissionMultiplier: 1.5 },
+    { date: new Date(2024, 10, 1), name: 'Diwali', admissionMultiplier: 1.8 },
+    { date: new Date(2024, 10, 15), name: 'Guru Nanak Jayanti', admissionMultiplier: 1.2 },
+    { date: new Date(2024, 11, 25), name: 'Christmas', admissionMultiplier: 1.2 },
 ];
 
 const generateChartData = (centerDate: Date) => {
