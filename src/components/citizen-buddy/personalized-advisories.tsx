@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bot, Zap, Loader2, Volume2, HeartPulse, Wind, Calendar, Square } from 'lucide-react';
-import { getPersonalizedAdvisory } from '@/app/actions';
+import { getPersonalizedAdvisory, generateSpeech } from '@/app/actions';
 import type { GeneratePersonalizedAdvisoryOutput } from '@/ai/flows/generate-personalized-advisory';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/context/language-context';
@@ -24,6 +25,7 @@ const content = {
     eventAdvisory: "Public Event Advisory",
     listen: "Listen to Advisory",
     stop: "Stop",
+    audioGenerationFailed: "Audio Generation Failed",
   },
   hi: {
     title: "व्यक्तिगत स्वास्थ्य सलाह",
@@ -38,6 +40,7 @@ const content = {
     eventAdvisory: "सार्वजनिक कार्यक्रम सलाह",
     listen: "सलाह सुनें",
     stop: "रोकें",
+    audioGenerationFailed: "ऑडियो जनरेशन विफल",
   },
   mr: {
     title: "वैयक्तिकृत आरोग्य सल्ला",
@@ -52,6 +55,7 @@ const content = {
     eventAdvisory: "सार्वजनिक कार्यक्रम सल्ला",
     listen: "सल्ला ऐका",
     stop: "थांबा",
+    audioGenerationFailed: "ऑडिओ निर्मिती अयशस्वी",
   },
   kn: {
     title: "ವೈಯಕ್ತಿಕಗೊಳಿಸಿದ ಆರೋಗ್ಯ ಸಲಹೆಗಳು",
@@ -66,6 +70,7 @@ const content = {
     eventAdvisory: "ಸಾರ್ವಜನಿಕ ಕಾರ್ಯಕ್ರಮ ಸಲಹೆ",
     listen: "ಸಲಹೆಯನ್ನು ಆಲಿಸಿ",
     stop: "ನಿಲ್ಲಿಸಿ",
+    audioGenerationFailed: "ಆಡಿಯೋ ಉತ್ಪಾದನೆ ವಿಫಲವಾಗಿದೆ",
     },
   te: {
     title: "వ్యక్తిగతీకరించిన ఆరోగ్య సలహాలు",
@@ -80,6 +85,7 @@ const content = {
     eventAdvisory: "ప్రజా కార్యక్రమ సలహా",
     listen: "సలహాను వినండి",
     stop: "ఆపు",
+    audioGenerationFailed: "ఆడియో జనరేషన్ విఫలమైంది",
   },
   ta: {
     title: "தனிப்பயனாக்கப்பட்ட சுகாதார ஆலோசனைகள்",
@@ -94,6 +100,7 @@ const content = {
     eventAdvisory: "பொது நிகழ்வு ஆலோசனை",
     listen: "ஆலோசனையைக் கேளுங்கள்",
     stop: "நிறுத்து",
+    audioGenerationFailed: "ஆடியோ உருவாக்கம் தோல்வியுற்றது",
   },
   sa: {
     title: "वैयक्तिकीकृताः स्वास्थ्यपरामर्शाः",
@@ -108,6 +115,7 @@ const content = {
     eventAdvisory: "सार्वजनिक-कार्यक्रम-परामर्शः",
     listen: "परामर्शं शृणोतु",
     stop: "विरामः",
+    audioGenerationFailed: "श्रव्यनिर्माणं विफलम्",
   },
 };
 
@@ -117,6 +125,7 @@ export function PersonalizedAdvisories() {
   const t = content[language];
   const [advisory, setAdvisory] = useState<GeneratePersonalizedAdvisoryOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -147,15 +156,36 @@ export function PersonalizedAdvisories() {
     }
   };
   
-  const handleListen = () => {
+  const handleListen = async () => {
     if (audioPlayer) {
       audioPlayer.pause();
       setAudioPlayer(null);
-    } else if (advisory && advisory.audio) {
-      const audio = new Audio(advisory.audio);
+      return;
+    }
+
+    if (!advisory) return;
+
+    setIsGeneratingAudio(true);
+    const textToSpeak = `
+      ${t.surgeAdvisory}: ${advisory.surgeAdvisory}.
+      ${t.aqiAdvisory}: ${advisory.aqiAdvisory}.
+      ${t.eventAdvisory}: ${advisory.eventAdvisory}.
+    `;
+
+    const result = await generateSpeech({ text: textToSpeak, language });
+    setIsGeneratingAudio(false);
+
+    if (result.success && result.data) {
+      const audio = new Audio(result.data.audio);
       setAudioPlayer(audio);
       audio.play();
       audio.onended = () => setAudioPlayer(null);
+    } else {
+      toast({
+        variant: "destructive",
+        title: t.audioGenerationFailed,
+        description: result.error,
+      });
     }
   };
 
@@ -190,8 +220,8 @@ export function PersonalizedAdvisories() {
         {advisory && (
           <div className="space-y-4">
             <div className='flex items-center justify-end'>
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={!advisory.audio}>
-                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={isGeneratingAudio}>
+                    {isGeneratingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
                     {audioPlayer ? t.stop : t.listen}
                 </Button>
             </div>

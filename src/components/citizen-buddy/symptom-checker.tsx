@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Bot, MessageSquare, Loader2, Volume2, Sparkles, AlertTriangle, Pill, Link as LinkIcon, Square } from 'lucide-react';
-import { getSymptomGuidance } from '@/app/actions';
+import { getSymptomGuidance, generateSpeech } from '@/app/actions';
 import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker-flow';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/context/language-context';
@@ -30,6 +31,7 @@ const content = {
     shopOnline: "Shop for Medicines Online",
     listen: "Listen",
     stop: "Stop",
+    audioGenerationFailed: "Audio Generation Failed",
   },
   hi: {
     title: "लक्षण परीक्षक",
@@ -45,6 +47,7 @@ const content = {
     shopOnline: "दवाएं ऑनलाइन खरीदें",
     listen: "सुनें",
     stop: "रोकें",
+    audioGenerationFailed: "ऑडियो जनरेशन विफल",
   },
   mr: {
     title: "लक्षण तपासक",
@@ -60,6 +63,7 @@ const content = {
     shopOnline: "औषधे ऑनलाइन खरेदी करा",
     listen: "ऐका",
     stop: "थांबा",
+    audioGenerationFailed: "ऑडिओ निर्मिती अयशस्वी",
   },
   kn: {
     title: "ರೋಗಲಕ್ಷಣ ಪರೀಕ್ಷಕ",
@@ -75,6 +79,7 @@ const content = {
     shopOnline: "ಔಷಧಿಗಳನ್ನು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಖರೀದಿಸಿ",
     listen: "ಆಲಿಸಿ",
     stop: "ನಿಲ್ಲಿಸಿ",
+    audioGenerationFailed: "ಆಡಿಯೋ ಉತ್ಪಾದನೆ ವಿಫಲವಾಗಿದೆ",
   },
   te: {
     title: "లక్షణాల తనిఖీ",
@@ -90,6 +95,7 @@ const content = {
     shopOnline: "మందులను ఆన్‌లైన్‌లో కొనండి",
     listen: "వినండి",
     stop: "ఆపు",
+    audioGenerationFailed: "ఆడియో జనరేషన్ విఫలమైంది",
   },
   ta: {
     title: "அறிகுறி சரிபார்ப்பு",
@@ -105,6 +111,7 @@ const content = {
     shopOnline: "ஆன்லைனில் மருந்துகளை வாங்கவும்",
     listen: "கேளுங்கள்",
     stop: "நிறுத்து",
+    audioGenerationFailed: "ஆடியோ உருவாக்கம் தோல்வியுற்றது",
   },
   sa: {
     title: "लक्षणपरीक्षकः",
@@ -120,6 +127,7 @@ const content = {
     shopOnline: "औषधानि जालतः क्रीणन्तु",
     listen: "शृणोतु",
     stop: "विरामः",
+    audioGenerationFailed: "श्रव्यनिर्माणं विफलम्",
   },
 };
 
@@ -130,6 +138,7 @@ export function SymptomChecker() {
   const [age, setAge] = useState('');
   const [guidance, setGuidance] = useState<SymptomCheckerOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
@@ -161,15 +170,36 @@ export function SymptomChecker() {
     }
   };
   
-  const handleListen = () => {
+  const handleListen = async () => {
     if (audioPlayer) {
       audioPlayer.pause();
       setAudioPlayer(null);
-    } else if (guidance && guidance.audio) {
-      const audio = new Audio(guidance.audio);
+      return;
+    }
+
+    if (!guidance) return;
+    
+    setIsGeneratingAudio(true);
+    const textToSpeak = `
+      ${t.aiGuidance}: ${guidance.guidance}.
+      ${t.medicationSuggestions}: ${guidance.medicationSuggestions}.
+      ${guidance.disclaimer}.
+    `;
+
+    const result = await generateSpeech({ text: textToSpeak, language });
+    setIsGeneratingAudio(false);
+
+    if (result.success && result.data) {
+      const audio = new Audio(result.data.audio);
       setAudioPlayer(audio);
       audio.play();
       audio.onended = () => setAudioPlayer(null);
+    } else {
+      toast({
+        variant: "destructive",
+        title: t.audioGenerationFailed,
+        description: result.error,
+      });
     }
   };
 
@@ -230,8 +260,8 @@ export function SymptomChecker() {
         {guidance && (
           <div className="space-y-4">
              <div className="flex items-center justify-end">
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={!guidance.audio}>
-                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={isGeneratingAudio}>
+                    {isGeneratingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
                     {audioPlayer ? t.stop : t.listen}
                 </Button>
             </div>
