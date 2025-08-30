@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bot, Zap, ShieldCheck, ListChecks, Loader2, Volume2 } from 'lucide-react';
+import { Bot, Zap, ShieldCheck, ListChecks, Loader2, Volume2, Square } from 'lucide-react';
 import { getSurgePredictions } from '@/app/actions';
 import type { GenerateSurgePredictionsOutput } from '@/ai/flows/generate-surge-predictions';
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +23,7 @@ const content = {
     confidenceLevel: "Confidence Level",
     recommendations: "Recommendations",
     listen: "Listen to Prediction",
+    stop: "Stop",
   },
   hi: {
     title: "एआई सर्ज पूर्वानुमान उपकरण",
@@ -36,6 +37,7 @@ const content = {
     confidenceLevel: "आत्मविश्वास स्तर",
     recommendations: "सिफारिशें",
     listen: "भविष्यवाणी सुनें",
+    stop: "रोकें",
   },
   mr: {
     title: "AI वाढीच्या अंदाजाचे साधन",
@@ -49,6 +51,7 @@ const content = {
     confidenceLevel: "आत्मविश्वास पातळी",
     recommendations: "शिफारसी",
     listen: "अंदाज ऐका",
+    stop: "थांबा",
   },
   kn: {
     title: "AI ಸರ್ಜ್ ಪ್ರಿಡಿಕ್ಷನ್ ಟೂಲ್",
@@ -62,6 +65,7 @@ const content = {
     confidenceLevel: "ವಿಶ್ವಾಸದ ಮಟ್ಟ",
     recommendations: "ಶಿಫಾರಸುಗಳು",
     listen: "ಭವಿಷ್ಯವಾಣಿಯನ್ನು ಆಲಿಸಿ",
+    stop: "ನಿಲ್ಲಿಸಿ",
   },
   te: {
     title: "AI సర్జ్ ప్రిడిక్షన్ సాధనం",
@@ -75,6 +79,7 @@ const content = {
     confidenceLevel: "విశ్వాస స్థాయి",
     recommendations: "సిఫార్సులు",
     listen: "సూచనను వినండి",
+    stop: "ఆపు",
   },
   ta: {
     title: "AI சர்ஜ் கணிப்பு கருவி",
@@ -88,6 +93,7 @@ const content = {
     confidenceLevel: "நம்பிக்கை நிலை",
     recommendations: "பரிந்துரைகள்",
     listen: "கணிப்பைக் கேளுங்கள்",
+    stop: "நிறுத்து",
   },
   sa: {
     title: "AI वृद्धि-पूर्वानुमान-साधनम्",
@@ -101,6 +107,7 @@ const content = {
     confidenceLevel: "विश्वासस्तरः",
     recommendations: "अनुशंसाः",
     listen: "भविष्यवाणीं शृणोतु",
+    stop: "विरामः",
   },
 };
 
@@ -141,11 +148,10 @@ export function SurgePredictionTool() {
   };
 
   const handleListen = () => {
-    if (prediction && prediction.audio) {
-      if (audioPlayer) {
-        audioPlayer.pause();
-        setAudioPlayer(null);
-      }
+    if (audioPlayer) {
+      audioPlayer.pause();
+      setAudioPlayer(null);
+    } else if (prediction && prediction.audio) {
       const audio = new Audio(prediction.audio);
       setAudioPlayer(audio);
       audio.play();
@@ -210,9 +216,9 @@ export function SurgePredictionTool() {
                     <Zap className="w-5 h-5 text-primary"/>
                     <CardTitle className="text-md font-medium">{t.recommendations}</CardTitle>
                  </div>
-                 <Button onClick={handleListen} size="sm" variant="outline" disabled={!prediction.audio || !!audioPlayer}>
-                    <Volume2 className="mr-2 h-4 w-4" />
-                    {t.listen}
+                 <Button onClick={handleListen} size="sm" variant="outline" disabled={!prediction.audio}>
+                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                    {audioPlayer ? t.stop : t.listen}
                 </Button>
               </CardHeader>
               <CardContent>

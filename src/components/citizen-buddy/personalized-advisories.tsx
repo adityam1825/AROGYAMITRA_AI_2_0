@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bot, Zap, Loader2, Volume2, HeartPulse, Wind, Calendar } from 'lucide-react';
+import { Bot, Zap, Loader2, Volume2, HeartPulse, Wind, Calendar, Square } from 'lucide-react';
 import { getPersonalizedAdvisory } from '@/app/actions';
 import type { GeneratePersonalizedAdvisoryOutput } from '@/ai/flows/generate-personalized-advisory';
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +23,7 @@ const content = {
     aqiAdvisory: "Air Quality Advisory",
     eventAdvisory: "Public Event Advisory",
     listen: "Listen to Advisory",
+    stop: "Stop",
   },
   hi: {
     title: "व्यक्तिगत स्वास्थ्य सलाह",
@@ -36,6 +37,7 @@ const content = {
     aqiAdvisory: "वायु गुणवत्ता सलाह",
     eventAdvisory: "सार्वजनिक कार्यक्रम सलाह",
     listen: "सलाह सुनें",
+    stop: "रोकें",
   },
   mr: {
     title: "वैयक्तिकृत आरोग्य सल्ला",
@@ -49,6 +51,7 @@ const content = {
     aqiAdvisory: "वायू गुणवत्ता सल्ला",
     eventAdvisory: "सार्वजनिक कार्यक्रम सल्ला",
     listen: "सल्ला ऐका",
+    stop: "थांबा",
   },
   kn: {
     title: "ವೈಯಕ್ತಿಕಗೊಳಿಸಿದ ಆರೋಗ್ಯ ಸಲಹೆಗಳು",
@@ -62,6 +65,7 @@ const content = {
     aqiAdvisory: "ವಾಯು ಗುಣಮಟ್ಟ ಸಲಹೆ",
     eventAdvisory: "ಸಾರ್ವಜನಿಕ ಕಾರ್ಯಕ್ರಮ ಸಲಹೆ",
     listen: "ಸಲಹೆಯನ್ನು ಆಲಿಸಿ",
+    stop: "ನಿಲ್ಲಿಸಿ",
     },
   te: {
     title: "వ్యక్తిగతీకరించిన ఆరోగ్య సలహాలు",
@@ -75,6 +79,7 @@ const content = {
     aqiAdvisory: "గాలి నాణ్యత సలహా",
     eventAdvisory: "ప్రజా కార్యక్రమ సలహా",
     listen: "సలహాను వినండి",
+    stop: "ఆపు",
   },
   ta: {
     title: "தனிப்பயனாக்கப்பட்ட சுகாதார ஆலோசனைகள்",
@@ -88,6 +93,7 @@ const content = {
     aqiAdvisory: "காற்றின் தர ஆலோசனை",
     eventAdvisory: "பொது நிகழ்வு ஆலோசனை",
     listen: "ஆலோசனையைக் கேளுங்கள்",
+    stop: "நிறுத்து",
   },
   sa: {
     title: "वैयक्तिकीकृताः स्वास्थ्यपरामर्शाः",
@@ -101,6 +107,7 @@ const content = {
     aqiAdvisory: "वायु-गुणवत्ता-परामर्शः",
     eventAdvisory: "सार्वजनिक-कार्यक्रम-परामर्शः",
     listen: "परामर्शं शृणोतु",
+    stop: "विरामः",
   },
 };
 
@@ -141,11 +148,10 @@ export function PersonalizedAdvisories() {
   };
   
   const handleListen = () => {
-    if (advisory && advisory.audio) {
-      if (audioPlayer) {
-        audioPlayer.pause();
-        setAudioPlayer(null);
-      }
+    if (audioPlayer) {
+      audioPlayer.pause();
+      setAudioPlayer(null);
+    } else if (advisory && advisory.audio) {
       const audio = new Audio(advisory.audio);
       setAudioPlayer(audio);
       audio.play();
@@ -184,9 +190,9 @@ export function PersonalizedAdvisories() {
         {advisory && (
           <div className="space-y-4">
             <div className='flex items-center justify-end'>
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={!advisory.audio || !!audioPlayer}>
-                    <Volume2 className="mr-2 h-4 w-4" />
-                    {t.listen}
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={!advisory.audio}>
+                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                    {audioPlayer ? t.stop : t.listen}
                 </Button>
             </div>
             <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-4">

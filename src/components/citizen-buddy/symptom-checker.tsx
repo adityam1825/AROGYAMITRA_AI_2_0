@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Bot, MessageSquare, Loader2, Volume2, Sparkles, AlertTriangle, Pill, Link as LinkIcon } from 'lucide-react';
+import { Bot, MessageSquare, Loader2, Volume2, Sparkles, AlertTriangle, Pill, Link as LinkIcon, Square } from 'lucide-react';
 import { getSymptomGuidance } from '@/app/actions';
 import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker-flow';
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +29,7 @@ const content = {
     medicationSuggestions: "Medication Suggestions",
     shopOnline: "Shop for Medicines Online",
     listen: "Listen",
+    stop: "Stop",
   },
   hi: {
     title: "लक्षण परीक्षक",
@@ -43,6 +44,7 @@ const content = {
     medicationSuggestions: "दवा सुझाव",
     shopOnline: "दवाएं ऑनलाइन खरीदें",
     listen: "सुनें",
+    stop: "रोकें",
   },
   mr: {
     title: "लक्षण तपासक",
@@ -57,6 +59,7 @@ const content = {
     medicationSuggestions: "औषध सूचना",
     shopOnline: "औषधे ऑनलाइन खरेदी करा",
     listen: "ऐका",
+    stop: "थांबा",
   },
   kn: {
     title: "ರೋಗಲಕ್ಷಣ ಪರೀಕ್ಷಕ",
@@ -71,6 +74,7 @@ const content = {
     medicationSuggestions: "ಔಷಧಿ ಸಲಹೆಗಳು",
     shopOnline: "ಔಷಧಿಗಳನ್ನು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಖರೀದಿಸಿ",
     listen: "ಆಲಿಸಿ",
+    stop: "ನಿಲ್ಲಿಸಿ",
   },
   te: {
     title: "లక్షణాల తనిఖీ",
@@ -85,6 +89,7 @@ const content = {
     medicationSuggestions: "మందుల సూచనలు",
     shopOnline: "మందులను ఆన్‌లైన్‌లో కొనండి",
     listen: "వినండి",
+    stop: "ఆపు",
   },
   ta: {
     title: "அறிகுறி சரிபார்ப்பு",
@@ -99,6 +104,7 @@ const content = {
     medicationSuggestions: "மருந்து பரிந்துரைகள்",
     shopOnline: "ஆன்லைனில் மருந்துகளை வாங்கவும்",
     listen: "கேளுங்கள்",
+    stop: "நிறுத்து",
   },
   sa: {
     title: "लक्षणपरीक्षकः",
@@ -113,6 +119,7 @@ const content = {
     medicationSuggestions: "औषध-सूचनाः",
     shopOnline: "औषधानि जालतः क्रीणन्तु",
     listen: "शृणोतु",
+    stop: "विरामः",
   },
 };
 
@@ -155,11 +162,10 @@ export function SymptomChecker() {
   };
   
   const handleListen = () => {
-    if (guidance && guidance.audio) {
-      if (audioPlayer) {
-        audioPlayer.pause();
-        setAudioPlayer(null);
-      }
+    if (audioPlayer) {
+      audioPlayer.pause();
+      setAudioPlayer(null);
+    } else if (guidance && guidance.audio) {
       const audio = new Audio(guidance.audio);
       setAudioPlayer(audio);
       audio.play();
@@ -224,9 +230,9 @@ export function SymptomChecker() {
         {guidance && (
           <div className="space-y-4">
              <div className="flex items-center justify-end">
-                <Button onClick={handleListen} size="sm" variant="outline" disabled={!guidance.audio || !!audioPlayer}>
-                    <Volume2 className="mr-2 h-4 w-4" />
-                    {t.listen}
+                <Button onClick={handleListen} size="sm" variant="outline" disabled={!guidance.audio}>
+                    {audioPlayer ? <Square className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                    {audioPlayer ? t.stop : t.listen}
                 </Button>
             </div>
             <Card>
