@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-export type City = 'Mumbai' | 'Delhi' | 'Bangalore' | 'Kolkata' | 'Chennai' | 'Pune' | 'Hyderabad' | 'Ahmedabad' | 'Jaipur' | 'Surat';
+export type City = 'Mumbai' | 'Delhi' | 'Bangalore' | 'Kolkata' | 'Chennai' | 'Pune' | 'Hyderabad' | 'Ahmedabad' | 'Jaipur' | 'Surat' | 'Thane' | 'Navi Mumbai' | 'Kalyan' | 'Vasai-Virar' | 'Panvel';
 
 interface CityContextType {
   city: City;

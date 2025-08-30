@@ -144,7 +144,7 @@ export function Header() {
     sa: 'संस्कृतम्',
   };
 
-  const cities: City[] = ['Mumbai', 'Delhi', 'Bangalore', 'Kolkata', 'Chennai', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Surat'];
+  const cities: City[] = ['Mumbai', 'Thane', 'Navi Mumbai', 'Kalyan', 'Vasai-Virar', 'Panvel', 'Delhi', 'Bangalore', 'Kolkata', 'Chennai', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Surat'];
 
   const handleLocationClick = () => {
     setIsLocating(true);
