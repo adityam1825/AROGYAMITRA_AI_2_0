@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/context/language-context';
+import { useCity } from '@/context/city-context';
 import { OverviewCards } from "@/components/dashboard/overview-cards";
 import { SurgePredictionChart } from "@/components/dashboard/surge-prediction-chart";
 import { HealthAdvisories } from "@/components/dashboard/health-advisories";
@@ -9,37 +10,38 @@ import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-too
 
 const content = {
   en: {
-    title: 'Mumbai Health Dashboard',
+    title: 'Health Dashboard',
   },
   hi: {
-    title: 'मुंबई स्वास्थ्य डैशबोर्ड',
+    title: 'स्वास्थ्य डैशबोर्ड',
   },
   mr: {
-    title: 'मुंबई आरोग्य डॅशबोर्ड',
+    title: 'आरोग्य डॅशबोर्ड',
   },
   kn: {
-    title: 'ಮುಂಬೈ ಆರೋಗ್ಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+    title: 'ಆರೋಗ್ಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
   },
   te: {
-    title: 'ముంబై ఆరోగ్య డాష్‌బోర్డ్',
+    title: 'ఆరోగ్య డాష్‌బోర్డ్',
   },
   ta: {
-    title: 'மும்பை சுகாதார டாஷ்போர்டு',
+    title: 'சுகாதார டாஷ்போர்டு',
   },
   sa: {
-    title: 'मुम्बयी स्वास्थ्योपकरणपटलम्',
+    title: 'स्वास्थ्योपकरणपटलम्',
   },
 };
 
 export function MainDashboard() {
   const { language } = useLanguage();
+  const { city } = useCity();
   const t = content[language];
 
   return (
     <>
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">
-          {t.title}
+          {city} {t.title}
         </h1>
       </div>
       <div className="space-y-4">

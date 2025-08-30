@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { LanguageProvider } from '@/context/language-context';
+import { CityProvider } from '@/context/city-context';
 
 export const metadata: Metadata = {
   title: 'SurgeGuard Mumbai',
@@ -22,8 +23,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <LanguageProvider>
-          {children}
-          <Toaster />
+          <CityProvider>
+            {children}
+            <Toaster />
+          </CityProvider>
         </LanguageProvider>
       </body>
     </html>
