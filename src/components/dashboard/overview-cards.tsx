@@ -6,6 +6,13 @@ import { Users, BedDouble, Droplets, CalendarDays } from "lucide-react";
 import { useLanguage } from '@/context/language-context';
 import { useCity } from '@/context/city-context';
 import { isSameDay, format } from 'date-fns';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 const content = {
   en: {
@@ -19,6 +26,7 @@ const content = {
     eventChange: "Ganesh Chaturthi",
     ganeshChaturthi: "Ganesh Chaturthi",
     diwali: "Diwali",
+    admissionsTooltip: "High admissions are likely due to respiratory issues from the Unhealthy AQI (158) and increased activity during Ganesh Chaturthi.",
   },
   hi: {
     admissions: "दाखिले",
@@ -31,6 +39,7 @@ const content = {
     eventChange: "गणेश चतुर्थी",
     ganeshChaturthi: "गणेश चतुर्थी",
     diwali: "दिवाली",
+    admissionsTooltip: "अस्वास्थ्यकर एक्यूआई (158) से श्वसन संबंधी समस्याओं और गणेश चतुर्थी के दौरान बढ़ी हुई गतिविधि के कारण उच्च प्रवेश की संभावना है।",
   },
   mr: {
     admissions: "प्रवेश",
@@ -43,6 +52,7 @@ const content = {
     eventChange: "गणेश चतुर्थी",
     ganeshChaturthi: "गणेश चतुर्थी",
     diwali: "दिवाळी",
+    admissionsTooltip: "अस्वास्थ्यकर AQI (158) मुळे श्वसनाच्या समस्या आणि गणेश चतुर्थी दरम्यान वाढलेल्या हालचालींमुळे जास्त प्रवेश होण्याची शक्यता आहे.",
   },
   kn: {
     admissions: "ದಾಖಲಾತಿಗಳು",
@@ -55,6 +65,7 @@ const content = {
     eventChange: "ಗಣೇಶ ಚತುರ್ಥಿ",
     ganeshChaturthi: "ಗಣೇಶ ಚತುರ್ಥಿ",
     diwali: "ದೀಪಾವಳಿ",
+    admissionsTooltip: "ಅನಾರೋಗ್ಯಕರ AQI (158) ನಿಂದ ಉಸಿರಾಟದ ತೊಂದರೆಗಳು ಮತ್ತು ಗಣೇಶ ಚತುರ್ಥಿಯ ಸಮಯದಲ್ಲಿ ಹೆಚ್ಚಿದ ಚಟುವಟಿಕೆಯಿಂದಾಗಿ ಹೆಚ್ಚಿನ ಪ್ರವೇಶಗಳು ಉಂಟಾಗಬಹುದು.",
   },
   te: {
     admissions: "ప్రవేశాలు",
@@ -67,6 +78,7 @@ const content = {
     eventChange: "వినాయక చవితి",
     ganeshChaturthi: "వినాయక చవితి",
     diwali: "దీపావళి",
+    admissionsTooltip: "అనారోగ్యకరమైన AQI (158) నుండి శ్వాసకోశ సమస్యలు మరియు వినాయక చవితి సందర్భంగా పెరిగిన కార్యకలాపాల కారణంగా అధిక ప్రవేశాలు ఎక్కువగా ఉంటాయి.",
   },
   ta: {
     admissions: "சேர்க்கைகள்",
@@ -79,6 +91,7 @@ const content = {
     eventChange: "விநாயகர் சதுர்த்தி",
     ganeshChaturthi: "விநாயகர் சதுர்த்தி",
     diwali: "தீபாவளி",
+    admissionsTooltip: "ஆரோக்கியமற்ற AQI (158) காரணமாக சுவாசப் பிரச்சினைகள் மற்றும் விநாயகர் சதுர்த்தியின் போது அதிகரித்த செயல்பாடு காரணமாக அதிக சேர்க்கை ஏற்பட வாய்ப்புள்ளது.",
   },
   sa: {
     admissions: "प्रवेशाः",
@@ -91,6 +104,7 @@ const content = {
     eventChange: "गणेश चतुर्थी",
     ganeshChaturthi: "गणेश चतुर्थी",
     diwali: "दीपावली",
+    admissionsTooltip: "अस्वास्थ्यकर-वायुगुणवत्ता-सूचकाङ्कात् (158) श्वसनसमस्यानां गणेशचतुर्थ्याः समये वर्धितक्रियाकलापानां च कारणात् अधिकप्रवेशानां सम्भावना वर्तते।",
   },
 };
 
@@ -105,6 +119,7 @@ export function OverviewCards() {
       value: "1,204",
       change: t.admissionsChange,
       icon: Users,
+      tooltip: t.admissionsTooltip,
     },
     {
       title: t.occupancy,
@@ -127,19 +142,30 @@ export function OverviewCards() {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {overviewData.map((item, index) => (
-        <Card key={index}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
-            <item.icon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{item.value}</div>
-            <p className="text-xs text-muted-foreground">{item.change}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <TooltipProvider>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {overviewData.map((item, index) => (
+           <Tooltip key={index}>
+            <TooltipTrigger asChild>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
+                    <item.icon className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{item.value}</div>
+                    <p className="text-xs text-muted-foreground">{item.change}</p>
+                  </CardContent>
+                </Card>
+            </TooltipTrigger>
+            {item.tooltip && (
+              <TooltipContent>
+                <p>{item.tooltip}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        ))}
+      </div>
+    </TooltipProvider>
   );
 }
