@@ -4,8 +4,10 @@
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, TooltipProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useLanguage } from '@/context/language-context';
+import { useCity } from '@/context/city-context';
 import { addDays, format } from 'date-fns';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+import { useMemo } from 'react';
 
 const content = {
   en: {
@@ -67,12 +69,16 @@ const content = {
 };
 
 
-const generateChartData = () => {
+const generateChartData = (city: string) => {
     const data = [];
     const today = new Date();
+    // Use a simple hash of the city name to create a seed for randomization
+    const seed = city.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
     for (let i = -3; i <= 3; i++) {
         const date = addDays(today, i);
-        const value = 1000 + Math.floor(Math.sin(date.getTime() / 86400000) * 200) + i * 50;
+        // Base value + sine wave for seasonality + city-specific variation + daily trend
+        const value = 1000 + Math.floor(Math.sin(date.getTime() / 86400000 + seed) * 200) + (seed % 100) + i * 50;
         
         const entry: { name: string; historical?: number; predicted?: number } = {
             name: format(date, 'MMM d'),
@@ -93,7 +99,7 @@ const CustomTooltip = ({ active, payload, label, t }: TooltipProps<ValueType, Na
   if (active && payload && payload.length) {
     const data = payload[0];
     const value = data.value as number;
-    const type = data.name as string;
+    const type = data.name === t.historical ? t.historical : t.predicted;
     return (
       <div className="rounded-lg border bg-background p-2 shadow-sm">
         <div className="grid grid-cols-2 gap-2">
@@ -122,8 +128,10 @@ const CustomTooltip = ({ active, payload, label, t }: TooltipProps<ValueType, Na
 
 export function SurgePredictionChart() {
   const { language } = useLanguage();
+  const { city } = useCity();
   const t = content[language];
-  const data = generateChartData();
+  
+  const data = useMemo(() => generateChartData(city), [city]);
   
   return (
     <Card className="h-full interactive-card">
