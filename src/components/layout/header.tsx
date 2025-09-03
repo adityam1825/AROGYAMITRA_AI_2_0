@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -150,17 +151,44 @@ export function Header() {
     setIsLocating(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // In a real app, you would use a reverse geocoding service
-          // to get the city from position.coords.latitude and position.coords.longitude.
-          // For this prototype, we'll simulate finding a city by picking a random one from our list.
-          const randomCity = cities[Math.floor(Math.random() * cities.length)];
-          setCity(randomCity);
-          toast({
-            title: t.locationSet,
-            description: t.cityUpdated(randomCity),
-          });
-          setIsLocating(false);
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await response.json();
+            
+            // OSM data can be complex, try to find city, town, or suburb
+            const detectedCity = data.address.city || data.address.town || data.address.suburb || data.address.village;
+            
+            if (detectedCity) {
+                // Check if the detected city is in our list of supported cities
+                const supportedCity = cities.find(c => c.toLowerCase() === detectedCity.toLowerCase());
+                if (supportedCity) {
+                    setCity(supportedCity);
+                    toast({
+                        title: t.locationSet,
+                        description: t.cityUpdated(supportedCity),
+                    });
+                } else {
+                    // Fallback to the first city if not supported, but still show what was found
+                     setCity(cities[0]);
+                     toast({
+                        title: t.locationSet,
+                        description: `${detectedCity} is not a supported city yet. Defaulting to ${cities[0]}.`,
+                    });
+                }
+            } else {
+                throw new Error("Could not determine city from location.");
+            }
+          } catch (error) {
+             toast({
+                variant: "destructive",
+                title: t.locationError,
+                description: "Could not fetch city name from your location.",
+            });
+          } finally {
+            setIsLocating(false);
+          }
         },
         (error) => {
           toast({
