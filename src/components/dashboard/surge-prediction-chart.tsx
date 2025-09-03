@@ -1,10 +1,11 @@
 
 'use client';
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, TooltipProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useLanguage } from '@/context/language-context';
 import { addDays, format } from 'date-fns';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 const content = {
   en: {
@@ -13,6 +14,7 @@ const content = {
     historical: "Historical",
     predicted: "Predicted",
     admissions: "Admissions",
+    tooltipDescription: (value: number, type: string) => `On this day, the ${type.toLowerCase()} number of admissions was ${value}.`,
   },
   hi: {
     title: "रोगी प्रवेश: 7-दिवसीय दृश्य",
@@ -20,6 +22,7 @@ const content = {
     historical: "ऐतिहासिक",
     predicted: "अनुमानित",
     admissions: "प्रवेश",
+    tooltipDescription: (value: number, type: string) => `इस दिन, ${type.toLowerCase()} प्रवेश की संख्या ${value} थी।`,
   },
   mr: {
     title: "रुग्ण प्रवेश: ७-दिवसांचे दृश्य",
@@ -27,6 +30,7 @@ const content = {
     historical: "ऐतिहासिक",
     predicted: "अंदाजित",
     admissions: "प्रवेश",
+    tooltipDescription: (value: number, type: string) => `या दिवशी, ${type.toLowerCase()} प्रवेशांची संख्या ${value} होती।`,
   },
   kn: {
     title: "ರೋಗಿಗಳ ದಾಖಲಾತಿ: 7-ದಿನಗಳ ನೋಟ",
@@ -34,6 +38,7 @@ const content = {
     historical: "ಐತಿಹಾಸಿಕ",
     predicted: "ಮುನ್ಸೂಚನೆ",
     admissions: "ದಾಖಲಾತಿಗಳು",
+    tooltipDescription: (value: number, type: string) => `ಈ ದಿನ, ${type.toLowerCase()} ದಾಖಲಾತಿಗಳ ಸಂಖ್ಯೆ ${value} ಆಗಿತ್ತು.`,
   },
   te: {
     title: "రోగి ప్రవేశాలు: 7-రోజుల వీక్షణ",
@@ -41,6 +46,7 @@ const content = {
     historical: "చారిత్రక",
     predicted: "అంచనా",
     admissions: "ప్రవేశాలు",
+    tooltipDescription: (value: number, type: string) => `ఈ రోజు, ${type.toLowerCase()} ప్రవేశాల సంఖ్య ${value}.`,
   },
   ta: {
     title: "நோயாளிகள் சேர்க்கை: 7-நாள் பார்வை",
@@ -48,6 +54,7 @@ const content = {
     historical: "வரலாற்று",
     predicted: "கணிக்கப்பட்டவை",
     admissions: "சேர்க்கைகள்",
+    tooltipDescription: (value: number, type: string) => `இந்த நாளில், ${type.toLowerCase()} சேர்க்கைகளின் எண்ணிக்கை ${value} ஆக இருந்தது.`,
   },
   sa: {
     title: "रोगीप्रवेशाः: ७-दिवसीयः दृष्टिकोणः",
@@ -55,6 +62,7 @@ const content = {
     historical: "ऐतिहासिकम्",
     predicted: "पूर्वानुमानितम्",
     admissions: "प्रवेशाः",
+    tooltipDescription: (value: number, type: string) => `अस्मिन् दिने, ${type.toLowerCase()} प्रवेशानां संख्या ${value} आसीत्।`,
   },
 };
 
@@ -80,6 +88,37 @@ const generateChartData = () => {
     }
     return data;
 }
+
+const CustomTooltip = ({ active, payload, label, t }: TooltipProps<ValueType, NameType> & { t: typeof content['en'] }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    const value = data.value as number;
+    const type = data.name as string;
+    return (
+      <div className="rounded-lg border bg-background p-2 shadow-sm">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col space-y-1">
+            <span className="text-[0.70rem] uppercase text-muted-foreground">
+              {type}
+            </span>
+            <span className="font-bold text-muted-foreground">{label}</span>
+          </div>
+          <div className="flex flex-col space-y-1">
+             <span className="text-[0.70rem] uppercase text-muted-foreground">
+              {t.admissions}
+            </span>
+            <span className="font-bold">
+              {value}
+            </span>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2 max-w-xs">{t.tooltipDescription(value, type)}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
 
 export function SurgePredictionChart() {
   const { language } = useLanguage();
@@ -113,11 +152,7 @@ export function SurgePredictionChart() {
             />
             <Tooltip
               cursor={{ fill: 'hsl(var(--card))' }}
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--card))', 
-                borderColor: 'hsl(var(--border))',
-                borderRadius: 'var(--radius)'
-              }}
+              content={<CustomTooltip t={t} />}
             />
             <Legend wrapperStyle={{fontSize: '14px'}} />
             <Bar dataKey="historical" fill="hsl(var(--secondary))" name={t.historical} radius={[4, 4, 0, 0]} />
