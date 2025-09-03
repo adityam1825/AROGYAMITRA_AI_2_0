@@ -56,7 +56,7 @@ const content = {
     admissions: "சேர்க்கைகள்",
     tooltipDescription: (value: number, type: string) => `இந்த நாளில், ${type.toLowerCase()} சேர்க்கைகளின் எண்ணிக்கை ${value} ஆக இருந்தது.`,
   },
-  sa: {
+  san: {
     title: "रोगीप्रवेशाः: ७-दिवसीयः दृष्टिकोणः",
     description: "आगामिनां ७ दिवसानां कृते ऐतिहासिकं तथा पूर्वानुमानितं प्रवेशाः।",
     historical: "ऐतिहासिकम्",

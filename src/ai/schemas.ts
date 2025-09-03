@@ -1,6 +1,6 @@
 import { z } from 'genkit';
 
-const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa']);
+const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'san']);
 
 export const CitizenHealthBuddyInputSchema = z.object({
   query: z.string().describe("The user's health-related query."),

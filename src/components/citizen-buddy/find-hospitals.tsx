@@ -6,11 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Hospital, LocateFixed, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { useCity } from '@/context/city-context';
+import { useCity, type City } from '@/context/city-context';
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
 
 const content = {
   en: {
@@ -23,6 +22,7 @@ const content = {
     couldNotAccess: "Could not access your location. Please enable location services.",
     geolocationUnsupported: "Geolocation is not supported by your browser.",
     noHospitals: "Could not find hospital data for this city.",
+    cityFromLocation: "Showing hospitals for your detected city:",
   },
   hi: {
     title: "आस-पास के अस्पताल खोजें",
@@ -34,6 +34,7 @@ const content = {
     couldNotAccess: "आपके स्थान तक नहीं पहुंच सका। कृपया स्थान सेवाएं सक्षम करें।",
     geolocationUnsupported: "आपके ब्राउज़र द्वारा जियोलोकेशन समर्थित नहीं है।",
     noHospitals: "इस शहर के लिए अस्पताल का डेटा नहीं मिला।",
+    cityFromLocation: "आपके द्वारा पता लगाए गए शहर के लिए अस्पताल दिखाए जा रहे हैं:",
   },
   mr: {
     title: "जवळची रुग्णालये शोधा",
@@ -45,6 +46,7 @@ const content = {
     couldNotAccess: "तुमच्या स्थानावर प्रवेश करू शकलो नाही. कृपया स्थान सेवा सक्षम करा.",
     geolocationUnsupported: "तुमच्या ब्राउझरद्वारे भौगोलिक स्थान समर्थित नाही.",
     noHospitals: "या शहरासाठी रुग्णालयाचा डेटा सापडला नाही.",
+    cityFromLocation: "तुमच्या शोधलेल्या शहरासाठी रुग्णालये दाखवत आहे:",
   },
   kn: {
     title: "ಹತ್ತಿರದ ಆಸ್ಪತ್ರೆಗಳನ್ನು ಹುಡುಕಿ",
@@ -56,6 +58,7 @@ const content = {
     couldNotAccess: "ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಪ್ರವೇಶಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
     geolocationUnsupported: "ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಿಂದ ಜಿಯೋಲೊಕೇಶನ್ ಬೆಂಬಲಿತವಾಗಿಲ್ಲ.",
     noHospitals: "ಈ ನಗರಕ್ಕೆ ಆಸ್ಪತ್ರೆ ಡೇಟಾವನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ.",
+    cityFromLocation: "ನಿಮ್ಮ ಪತ್ತೆಹಚ್ಚಿದ ನಗರಕ್ಕಾಗಿ ಆಸ್ಪತ್ರೆಗಳನ್ನು ತೋರಿಸಲಾಗುತ್ತಿದೆ:",
   },
   te: {
     title: " సమీపంలోని ఆసుపత్రులను కనుగొనండి",
@@ -67,6 +70,7 @@ const content = {
     couldNotAccess: "మీ స్థానాన్ని యాక్సెస్ చేయలేకపోయింది. దయచేసి స్థాన సేవలను ప్రారంభించండి.",
     geolocationUnsupported: "మీ బ్రౌజర్ ద్వారా జియోలోకేషన్ మద్దతు లేదు.",
     noHospitals: "ఈ నగరానికి సంబంధించిన ఆసుపత్రి డేటా కనుగొనబడలేదు.",
+    cityFromLocation: "మీరు గుర్తించిన నగరం కోసం ఆసుపత్రులను చూపుతోంది:",
   },
   ta: {
     title: "அருகிலுள்ள மருத்துவமனைகளைக் கண்டறியவும்",
@@ -78,8 +82,9 @@ const content = {
     couldNotAccess: "உங்கள் இருப்பிடத்தை அணுக முடியவில்லை. இருப்பிடச் சேவைகளை இயக்கவும்.",
     geolocationUnsupported: "உங்கள் உலாவியால் புவிஇருப்பிடம் ஆதரிக்கப்படவில்லை.",
     noHospitals: "இந்த நகரத்திற்கான மருத்துவமனை தரவைக் கண்டுபிடிக்க முடியவில்லை.",
+    cityFromLocation: "உங்கள் கண்டறியப்பட்ட நகரத்திற்கான மருத்துவமனைகளைக் காட்டுகிறது:",
   },
-  sa: {
+  san: {
     title: "समीपस्थानि चिकित्सालयान् अन्विष्यन्तु",
     description: "भवतः समीपे चिकित्सालयान् अन्विष्यन्तु।",
     findHospitals: "मम समीपे चिकित्सालयान् अन्विष्यन्तु",
@@ -89,10 +94,11 @@ const content = {
     couldNotAccess: "भवतः स्थानं प्राप्तुं न शक्तम्। कृपया स्थानसेवां चालयन्तु।",
     geolocationUnsupported: "भवतः ब्राउजरेण भौगोलिकस्थानं न समर्थितम्।",
     noHospitals: "अस्य नगरस्य कृते चिकित्सालयस्य दत्तांशः न प्राप्तः।",
+    cityFromLocation: "भवतः अन्वेषितनगरस्य कृते चिकित्सालयाः प्रदर्श्यन्ते:",
   },
 };
 
-const hospitalData = {
+const hospitalData: Record<City, { name: string; address: string; distance: number }[]> = {
     Mumbai: [
         { name: "Lilavati Hospital and Research Centre", address: "Bandra West", distance: 2.5 },
         { name: "Kokilaben Dhirubhai Ambani Hospital", address: "Andheri West", distance: 5.1 },
@@ -105,43 +111,62 @@ const hospitalData = {
         { name: "Max Healthcare Saket", address: "Saket", distance: 7.8 },
         { name: "Indraprastha Apollo Hospitals", address: "Sarita Vihar", distance: 10.5 },
         { name: "Sir Ganga Ram Hospital", address: "Rajinder Nagar", distance: 4.1 },
-    ]
+    ],
+    Bangalore: [], Chennai: [], Kolkata: [], Pune: [], Hyderabad: [], Ahmedabad: [], Jaipur: [], Surat: [], Thane: [], 'Navi Mumbai': [], Kalyan: [], 'Vasai-Virar': [], Panvel: [],
 };
 
 type HospitalInfo = { name: string; address: string; distance: number };
 
 export function FindHospitals() {
   const { language } = useLanguage();
-  const { city } = useCity();
+  const { city: selectedCity, setCity } = useCity();
   const t = content[language];
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
   const [hospitals, setHospitals] = useState<HospitalInfo[]>([]);
+  const [displayCity, setDisplayCity] = useState<City | null>(null);
+  const [usedLocation, setUsedLocation] = useState(false);
+
+
+  const fetchHospitals = (targetCity: City) => {
+    const cityHospitals = hospitalData[targetCity] || [];
+    if (cityHospitals.length > 0) {
+        setHospitals(cityHospitals);
+        setDisplayCity(targetCity);
+    } else {
+        setHospitals([]);
+        setDisplayCity(null);
+        toast({ variant: "destructive", title: t.noHospitals });
+    }
+  }
 
   const handleFindHospitals = () => {
     setIsLoading(true);
     setHospitals([]);
+    setUsedLocation(false);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Simulate finding hospitals based on city
-          const cityHospitals = hospitalData[city as keyof typeof hospitalData] || [];
-          if (cityHospitals.length > 0) {
-            setHospitals(cityHospitals);
-          } else {
-            toast({ variant: "destructive", title: t.noHospitals });
-          }
+          // Simulate reverse geocoding to find city.
+          // In a real app, this would be an API call.
+          const detectedCity: City = 'Mumbai'; // Mocking detection
+          setCity(detectedCity);
+          fetchHospitals(detectedCity);
+          setUsedLocation(true);
           setIsLoading(false);
         },
         (error) => {
+          // If geolocation fails, fall back to the selected city
           toast({ variant: "destructive", title: t.locationError, description: t.couldNotAccess });
+          fetchHospitals(selectedCity);
           setIsLoading(false);
         }
       );
     } else {
       toast({ variant: "destructive", title: t.geolocationUnsupported });
+      fetchHospitals(selectedCity); // Fallback if geolocation is not supported
       setIsLoading(false);
     }
   };
@@ -161,10 +186,11 @@ export function FindHospitals() {
           {isLoading ? t.finding : t.findHospitals}
         </Button>
         
-        {hospitals.length > 0 && (
+        {hospitals.length > 0 && displayCity && (
           <div className="space-y-2">
             <Separator />
-            <h3 className="text-md font-semibold">{t.hospitalsIn} {city}</h3>
+            <h3 className="text-md font-semibold">{t.hospitalsIn} {displayCity}</h3>
+            {usedLocation && <p className="text-xs text-muted-foreground">{t.cityFromLocation} <strong>{displayCity}</strong></p>}
             <ScrollArea className="h-48 w-full">
               <div className="space-y-2 pr-4">
                 {hospitals.map((hospital, index) => (

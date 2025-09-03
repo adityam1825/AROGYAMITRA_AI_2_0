@@ -97,7 +97,7 @@ const content = {
     reminderAlertTitle: "மருந்து நினைவூட்டல்",
     reminderAlertDesc: (medicine: string, dosage: string) => `உங்கள் ${medicine}${dosage ? ` (${dosage})` : ''} எடுத்துக்கொள்ள வேண்டிய நேரம்.`,
   },
-  sa: {
+  san: {
     title: "औषधस्मारकाणि",
     description: "स्वस्य औषधानां कृते स्मारकाणि स्थापयन्तु। भवन्तः सूचनां प्राప్स्यन्ति।",
     medicineName: "औषधस्य नाम",

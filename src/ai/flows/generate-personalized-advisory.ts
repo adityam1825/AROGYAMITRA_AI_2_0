@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import wav from 'wav';
 
-const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa']);
+const LanguageEnum = z.enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'san']);
 
 const GeneratePersonalizedAdvisoryInputSchema = z.object({
   city: z.string().describe('The city for which to generate the advisory.'),

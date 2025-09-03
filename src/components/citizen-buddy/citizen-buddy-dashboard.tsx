@@ -28,7 +28,7 @@ const content = {
     ta: {
         title: "சிட்டிசன் படி",
     },
-    sa: {
+    san: {
         title: "नागरिक-बन्धुः",
     },
 };

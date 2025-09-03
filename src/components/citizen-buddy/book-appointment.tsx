@@ -108,7 +108,7 @@ const content = {
     successDesc: (hospital: string, date: string) => `${hospital} இல் ${date} அன்று உங்கள் சந்திப்பு உறுதிசெய்யப்பட்டது.`,
     error: "தயவுசெய்து எல்லா புலங்களையும் நிரப்பவும்.",
   },
-  sa: {
+  san: {
     title: "समयं निश्चिनोतु",
     description: "समीपस्थे चिकित्सालये वैद्येन सह मेलनस्य समयं निश्चिनोतु।",
     hospital: "चिकित्सालयः",

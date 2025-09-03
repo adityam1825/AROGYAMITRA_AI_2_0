@@ -38,7 +38,7 @@ const content = {
     dashboard: "டாஷ்போர்டு",
     citizenBuddy: "சிட்டிசன் படி",
   },
-  sa: {
+  san: {
     dashboard: "उपकरणपटलम्",
     citizenBuddy: "नागरिक-बन्धुः",
   },

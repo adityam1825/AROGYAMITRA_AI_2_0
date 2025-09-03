@@ -15,7 +15,7 @@ import { getCachedAudio, setCachedAudio } from '@/ai/audio-cache';
 const TextToSpeechInputSchema = z.object({
   text: z.string().describe('The text to be converted to speech.'),
   language: z
-    .enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'sa'])
+    .enum(['en', 'hi', 'mr', 'kn', 'te', 'ta', 'san'])
     .describe('The language of the text.'),
 });
 export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;

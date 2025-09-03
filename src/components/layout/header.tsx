@@ -110,7 +110,7 @@ const content = {
     support: "ஆதரவு",
     logout: "வெளியேறு",
   },
-  sa: {
+  san: {
     selectCity: "नगरं चिनोतु",
     useMyLocation: "मम स्थानं प्रयुज्यताम्",
     locationSet: "स्थानं निर्धारितम्",
@@ -141,7 +141,7 @@ export function Header() {
     kn: 'ಕನ್ನಡ',
     te: 'తెలుగు',
     ta: 'தமிழ்',
-    sa: 'संस्कृतम्',
+    san: 'संस्कृतम्',
   };
 
   const cities: City[] = ['Mumbai', 'Thane', 'Navi Mumbai', 'Kalyan', 'Vasai-Virar', 'Panvel', 'Delhi', 'Bangalore', 'Kolkata', 'Chennai', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Surat'];
@@ -231,7 +231,7 @@ export function Header() {
             <DropdownMenuRadioItem value="kn">ಕನ್ನಡ</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="te">తెలుగు</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="ta">தமிழ்</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="sa">संस्कृतम्</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="san">संस्कृतम्</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
