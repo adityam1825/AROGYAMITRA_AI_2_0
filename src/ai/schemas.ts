@@ -34,3 +34,19 @@ export const CitizenHealthBuddyOutputSchema = z.object({
 export type CitizenHealthBuddyOutput = z.infer<
   typeof CitizenHealthBuddyOutputSchema
 >;
+
+export const FindNearbyHospitalsInputSchema = z.object({
+  city: z.string().describe('The city where the user is located.'),
+});
+export type FindNearbyHospitalsInput = z.infer<typeof FindNearbyHospitalsInputSchema>;
+
+const HospitalSchema = z.object({
+    name: z.string().describe('The name of the hospital.'),
+    address: z.string().describe('The address or locality of the hospital.'),
+    distance: z.string().optional().describe('The approximate distance from the user.'),
+});
+
+export const FindNearbyHospitalsOutputSchema = z.object({
+  hospitals: z.array(HospitalSchema).describe('A list of nearby hospitals.'),
+});
+export type FindNearbyHospitalsOutput = z.infer<typeof FindNearbyHospitalsOutputSchema>;

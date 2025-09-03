@@ -23,7 +23,8 @@ import {
 import {
   citizenHealthBuddy
 } from '@/ai/flows/citizen-health-buddy-flow';
-import type { CitizenHealthBuddyInput, CitizenHealthBuddyOutput } from '@/ai/schemas';
+import type { CitizenHealthBuddyInput, CitizenHealthBuddyOutput, FindNearbyHospitalsInput, FindNearbyHospitalsOutput } from '@/ai/schemas';
+import { findNearbyHospitals } from "@/ai/flows/find-nearby-hospitals";
 
 
 export async function getSurgePredictions(input: GenerateSurgePredictionsInput): Promise<{
@@ -119,5 +120,25 @@ export async function getHealthBuddyResponse(input: CitizenHealthBuddyInput): Pr
         }
 
         return { success: false, error: `Failed to generate response: ${errorMessage}` };
+    }
+}
+
+export async function getNearbyHospitals(input: FindNearbyHospitalsInput): Promise<{
+    success: boolean;
+    data?: FindNearbyHospitalsOutput;
+    error?: string;
+}> {
+    try {
+        const result = await findNearbyHospitals(input);
+        return { success: true, data: result };
+    } catch (error) {
+        console.error("Error finding nearby hospitals:", error);
+        
+        let errorMessage = 'An unknown error occurred.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return { success: false, error: `Failed to find hospitals: ${errorMessage}` };
     }
 }
