@@ -5,11 +5,6 @@ import {
   SidebarProvider,
   Sidebar,
 } from "@/components/ui/sidebar";
-import { OverviewCards } from "@/components/dashboard/overview-cards";
-import { SurgePredictionChart } from "@/components/dashboard/surge-prediction-chart";
-import { HealthAdvisories } from "@/components/dashboard/health-advisories";
-import { RecentAlerts } from "@/components/dashboard/recent-alerts";
-import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-tool";
 import { MainDashboard } from "@/components/dashboard/main-dashboard";
 
 export const metadata: Metadata = {

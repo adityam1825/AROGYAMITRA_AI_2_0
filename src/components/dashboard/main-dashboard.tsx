@@ -7,6 +7,7 @@ import { SurgePredictionChart } from "@/components/dashboard/surge-prediction-ch
 import { HealthAdvisories } from "@/components/dashboard/health-advisories";
 import { RecentAlerts } from "@/components/dashboard/recent-alerts";
 import { SurgePredictionTool } from "@/components/dashboard/surge-prediction-tool";
+import { HowItWorks } from './how-it-works';
 
 const content = {
   en: {
@@ -54,6 +55,7 @@ export function MainDashboard() {
             <HealthAdvisories />
           </div>
         </div>
+        <HowItWorks />
         <SurgePredictionTool />
         <RecentAlerts />
       </div>
