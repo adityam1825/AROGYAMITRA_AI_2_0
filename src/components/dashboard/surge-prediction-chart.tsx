@@ -126,7 +126,7 @@ export function SurgePredictionChart() {
   const data = generateChartData();
   
   return (
-    <Card className="h-full">
+    <Card className="h-full interactive-card">
       <CardHeader>
         <CardTitle>{t.title}</CardTitle>
         <CardDescription>{t.description}</CardDescription>

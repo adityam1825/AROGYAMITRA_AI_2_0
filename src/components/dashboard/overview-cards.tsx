@@ -78,7 +78,7 @@ const content = {
     eventChange: "వినాయక చవితి",
     ganeshChaturthi: "వినాయక చవితి",
     diwali: "దీపావళి",
-    admissionsTooltip: "అనారోగ్యకరమైన AQI (158) నుండి శ్వాసకోశ సమస్యలు మరియు వినాయక చవితి సందర్భంగా పెరిగిన కార్యకలాపాల కారణంగా అధిక ప్రవేశాలు ఎక్కువగా ఉంటాయి.",
+    admissionsTooltip: "అనారోగ్యకరమైన AQI (158) నుండి శ్వాసకోశ సమస్యలు మరియు వినాయక చవితి సందర్భంగా పెరిగిన కార్యలాపాల కారణంగా అధిక ప్రవేశాలు ఎక్కువగా ఉంటాయి.",
   },
   ta: {
     admissions: "சேர்க்கைகள்",
@@ -147,7 +147,7 @@ export function OverviewCards() {
         {overviewData.map((item, index) => (
            <Tooltip key={index}>
             <TooltipTrigger asChild>
-                <Card>
+                <Card className="interactive-card">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
                     <item.icon className="h-4 w-4 text-muted-foreground" />

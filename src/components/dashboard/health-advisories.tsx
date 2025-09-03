@@ -135,7 +135,7 @@ export function HealthAdvisories() {
 
 
   return (
-    <Card>
+    <Card className="interactive-card">
       <CardHeader>
         <div className="flex items-center gap-2">
             <HeartPulse className="h-6 w-6 text-primary" />
